@@ -119,14 +119,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .card {
   padding: 1rem;
   box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 1px 3px 0 rgba(0, 0, 0, 0.12);
   border-radius: 4px;
 }
-@media screen and (max-width: 576px) {
+/* @media screen and (max-width: 576px) {
   .sound-list-item {
     flex-direction: column;
     align-items: center;
@@ -156,5 +156,5 @@ export default {
       width: 100%;
     }
   }
-}
+} */
 </style>
