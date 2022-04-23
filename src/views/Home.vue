@@ -115,14 +115,14 @@ export default {
     },
     login() {
       window.open(
-        'https://discord.com/oauth2/authorize?' +
-          'response_type=code&' +
-          'client_id=964300281674346498&' +
+        `https://discord.com/oauth2/authorize?` +
+          `response_type=code&` +
+          `client_id=964300281674346498&` +
           `redirect_uri=${
-            import.meta.env.domain
+            import.meta.env.VITE_DOMAIN
           }/auth/redirect&display=popup&` +
-          'scope=identify%20guilds%20guilds.members.read%20messages.read',
-        '_self'
+          `scope=identify%20guilds%20guilds.members.read%20messages.read`,
+        `_self`
       );
     },
     logout() {
