@@ -118,7 +118,9 @@ export default {
         'https://discord.com/oauth2/authorize?' +
           'response_type=code&' +
           'client_id=964300281674346498&' +
-          'redirect_uri=http://localhost:3000/auth/redirect&display=popup&' +
+          `redirect_uri=${
+            import.meta.env.domain
+          }/auth/redirect&display=popup&` +
           'scope=identify%20guilds%20guilds.members.read%20messages.read',
         '_self'
       );
