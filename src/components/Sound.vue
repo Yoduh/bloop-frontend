@@ -1,7 +1,14 @@
 <template>
   <div class="sound-grid-item card">
     <div class="sound-grid-item-content">
-      <h2>{{ sound.data.name }}</h2>
+      <div class="sound-grid-item-top">
+        <h2 class="mr-2">{{ sound.data.name }}</h2>
+        <Button
+          icon="pi pi-send"
+          class="p-button-success p-button-rounded p-button-outlined"
+          @click="$emit('playSound', sound.data.name)"
+        ></Button>
+      </div>
       <div class="img-container" @click="previewSound(sound.data.name)">
         <img
           :src="`https://img.youtube.com/vi/${sound.data.link.slice(
@@ -13,17 +20,15 @@
           height="150"
         />
         <div class="img-hover">
-          <span
-            class="pi pi-play"
-            style="font-size: 4rem; color: #a4e48a"
-          ></span>
+          <div style="margin-bottom: 5px">Preview</div>
+          <i class="pi pi-play" style="font-size: 4rem; color: #a4e48a"></i>
         </div>
       </div>
       <div class="sound-description">
         {{ description(sound.data.description) }}
       </div>
     </div>
-    <div class="sound-grid-item-bottom">
+    <div class="sound-grid-item-bottom mt-2">
       <div class="sound-link">
         <Button
           class="p-button-rounded p-button-text"
@@ -32,11 +37,6 @@
           <img src="../assets/yt-icon.png" width="30" class="mr-2" />Source
         </Button>
       </div>
-      <Button
-        icon="pi pi-send"
-        class="p-button-success p-button-rounded p-button-outlined"
-        @click="$emit('playSound', sound.data.name)"
-      ></Button>
     </div>
   </div>
 </template>
@@ -102,7 +102,7 @@ img {
 }
 .img-container:hover .img-sound {
   cursor: pointer;
-  opacity: 0.3;
+  opacity: 0.2;
 }
 
 .img-container:hover .img-hover {
@@ -127,12 +127,16 @@ img {
   margin: 0.5rem;
   border: 1px solid var(--surface-border);
 }
-
-.sound-grid-item-bottom {
+.sound-grid-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* .sound-grid-item-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
+} */
 
 .sound-description {
   margin-top: 15px;
