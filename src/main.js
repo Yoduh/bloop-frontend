@@ -8,7 +8,7 @@ import Toast from 'primevue/toast';
 import Card from 'primevue/card';
 import DataView from 'primevue/dataview';
 import InputText from 'primevue/inputtext';
-import Image from 'primevue/image';
+import Tooltip from 'primevue/tooltip';
 
 import 'primevue/resources/themes/md-dark-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -25,6 +25,7 @@ app.component('Toast', Toast);
 app.component('Card', Card);
 app.component('DataView', DataView);
 app.component('InputText', InputText);
-app.component('Image', Image);
+
+app.directive('tooltip', Tooltip);
 
 app.mount('#app');

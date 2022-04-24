@@ -3,13 +3,8 @@
     <div class="sound-grid-item-content">
       <div class="sound-grid-item-top">
         <h2 class="mr-2">{{ sound.data.name }}</h2>
-        <Button
-          icon="pi pi-send"
-          class="p-button-success p-button-rounded p-button-outlined"
-          @click="$emit('playSound', sound.data.name)"
-        ></Button>
       </div>
-      <div class="img-container" @click="previewSound(sound.data.name)">
+      <div class="img-container" @click="$emit('playSound', sound.data.name)">
         <img
           :src="`https://img.youtube.com/vi/${sound.data.link.slice(
             -11
@@ -20,23 +15,27 @@
           height="150"
         />
         <div class="img-hover">
-          <div style="margin-bottom: 5px">Preview</div>
-          <i class="pi pi-play" style="font-size: 4rem; color: #a4e48a"></i>
+          <i class="pi pi-send" style="font-size: 4rem; color: #a4e48a"></i>
         </div>
       </div>
       <div class="sound-description">
         {{ description(sound.data.description) }}
       </div>
     </div>
-    <div class="sound-grid-item-bottom mt-2">
-      <div class="sound-link">
-        <Button
-          class="p-button-rounded p-button-text"
-          @click="gotoYoutube(sound.data.link, sound.data.start)"
-        >
-          <img src="../assets/yt-icon.png" width="30" class="mr-2" />Source
-        </Button>
-      </div>
+    <div class="sound-grid-item-bottom mt-1">
+      <Button
+        class="p-button-rounded p-button-text"
+        @click="gotoYoutube(sound.data.link, sound.data.start)"
+        v-tooltip.top="'Source'"
+      >
+        <img src="../assets/yt-icon.png" width="50" class="mr-2" />
+      </Button>
+      <Button
+        icon="pi pi-play"
+        class="p-button-success p-button-rounded p-button-outlined"
+        @click="previewSound(sound.data.name)"
+        v-tooltip.top="'Preview'"
+      ></Button>
     </div>
   </div>
 </template>
@@ -132,11 +131,11 @@ img {
   align-items: center;
   justify-content: center;
 }
-/* .sound-grid-item-bottom {
+.sound-grid-item-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-} */
+}
 
 .sound-description {
   margin-top: 15px;

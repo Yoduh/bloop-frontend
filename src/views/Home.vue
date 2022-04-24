@@ -49,13 +49,15 @@
       />
     </div>
   </div>
-  <div v-if="selectedChannel !== ''">
-    <Button
-      label="Refresh Sounds"
-      class="m-4"
-      @click="refreshSounds()"
-    ></Button>
-    <SoundList :sounds="sounds" @playSound="playSound" />
+  <div v-if="selectedChannel !== ''" class="mt-7">
+    <div class="mt-4">
+      Click an image below to play the sound bite in your selected channel
+    </div>
+    <SoundList
+      :sounds="sounds"
+      @playSound="playSound"
+      @getSounds="getSounds()"
+    />
   </div>
 </template>
 
@@ -171,14 +173,6 @@ export default {
             });
           }
         });
-    },
-    refreshSounds() {
-      this.getSounds();
-      this.$toast.add({
-        severity: 'success',
-        summary: 'Sounds Refreshed!',
-        life: 3000
-      });
     }
   },
   async mounted() {

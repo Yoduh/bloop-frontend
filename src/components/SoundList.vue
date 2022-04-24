@@ -1,9 +1,17 @@
 <template>
   <div v-if="sounds" class="card">
-    <span class="p-input-icon-left">
-      <i class="pi pi-search" />
-      <InputText type="text" v-model="soundFilter" placeholder="Filter" />
-    </span>
+    <div class="features">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search" />
+        <InputText type="text" v-model="soundFilter" placeholder="Filter" />
+      </span>
+
+      <Button
+        label="Refresh Sounds"
+        class="ml-5"
+        @click="refreshSounds()"
+      ></Button>
+    </div>
     <DataView
       :value="filteredSounds"
       :layout="layout"
@@ -114,6 +122,14 @@ export default {
     },
     emitSound(sound) {
       this.$emit('playSound', sound);
+    },
+    refreshSounds() {
+      this.$emit('getSounds');
+      this.$toast.add({
+        severity: 'success',
+        summary: 'Sounds Refreshed!',
+        life: 3000
+      });
     }
   }
 };
@@ -125,6 +141,11 @@ export default {
   box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 1px 3px 0 rgba(0, 0, 0, 0.12);
   border-radius: 4px;
+}
+.features {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 /* @media screen and (max-width: 576px) {
   .sound-list-item {
