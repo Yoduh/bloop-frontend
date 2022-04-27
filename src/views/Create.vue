@@ -30,8 +30,8 @@
         <Slider
           v-model="rangeSlider"
           show-tooltip="always"
-          :min="0"
-          :max="duration"
+          :min="sliderMin"
+          :max="sliderMax"
           :step="0.01"
           :options="sliderOptions"
           @start="start"
@@ -39,9 +39,9 @@
         />
         <div class="grid justify-content-center mt-7">
           <ToggleButton
-            id="toggleBtn"
+            id="togglePlay"
             class="p-button-outlined mx-5"
-            v-model="toggleBtn"
+            v-model="togglePlay"
             onIcon="pi pi-pause"
             offIcon="pi pi-play"
             @click="togglePlayer"
@@ -52,6 +52,23 @@
             class="p-button-rounded p-button-outlined p-button-lg mx-5"
             @click="replay"
           />
+          <Button
+            id="zoomIn"
+            class="p-button-rounded p-button-outlined p-button-lg mx-5"
+            icon="pi pi-search-plus"
+            @click="sliderZoom(true)"
+            v-tooltip.top="
+              'Set min and max slider values to current \'Start\' and \'End\' locations'
+            "
+          />
+          <Button
+            id="zoomOut"
+            v-if="toggleZoom"
+            class="p-button-rounded p-button-outlined p-button-lg mx-5"
+            icon="pi pi-search-minus"
+            @click="sliderZoom(false)"
+            v-tooltip.top="'Zoom out to original scale'"
+          />
         </div>
         <div
           class="p-fluid grid formgrid mt-3 start-end-inputs justify-content-between align-items-start"
@@ -59,7 +76,7 @@
           <div
             class="sm:col-5 lg:col-4 xl:col-5 flex flex-column justify-content-start"
           >
-            <div>Start</div>
+            <div>Start (seconds)</div>
             <InputNumber
               v-model="rangeSlider[0]"
               mode="decimal"
@@ -75,7 +92,7 @@
           <div
             class="sm:col-5 md:col-5 lg:col-4 xl:col-5 flex flex-column justify-content-start"
           >
-            <div>End</div>
+            <div>End (seconds)</div>
             <InputNumber
               v-model="rangeSlider[2]"
               mode="decimal"
@@ -181,12 +198,14 @@ const sliderOptions = {
 };
 const player = ref(null);
 const duration = ref(0);
+const togglePlay = ref(false);
 
 const rangeSlider = ref([0, 0, 9]);
-const toggleBtn = ref(false);
+const sliderMin = ref(0);
+const sliderMax = ref(9);
 
 let videoState = -1;
-let prevVideoState = null;
+// let prevVideoState = null;
 
 const getYoutube = e => {
   if (e.key === 'Enter') {
@@ -198,8 +217,9 @@ const getYoutube = e => {
 const onPlayerReady = () => {
   // console.log('ready');
   duration.value = player.value.getDuration();
+  sliderMax.value = duration.value;
 };
-const start = (e, i) => {
+const start = () => {
   // console.log('start', e, i);
   player.value.pauseVideo();
 };
@@ -208,12 +228,14 @@ const end = (e, i) => {
   // prevent overlapping sliders
   if (i === 0 && rangeSlider.value[0] >= rangeSlider.value[2]) {
     rangeSlider.value[0] =
-      rangeSlider.value[0] - 0.1 >= 0 ? rangeSlider.value[0] - 0.1 : 0;
+      rangeSlider.value[0] - 0.1 >= sliderMin.value
+        ? rangeSlider.value[0] - 0.1
+        : sliderMin.value;
   } else if (i === 2 && rangeSlider.value[2] <= rangeSlider.value[0]) {
     rangeSlider.value[2] =
-      rangeSlider.value[2] + 0.1 <= duration.value
+      rangeSlider.value[2] + 0.1 <= sliderMax.value
         ? rangeSlider.value[2] + 0.1
-        : duration.value;
+        : sliderMax.value;
   }
   if (i === 1) {
     player.value.seekTo(rangeSlider.value[1], true);
@@ -249,13 +271,13 @@ player states:
 */
 let interval = null;
 const stateChange = state => {
-  prevVideoState = videoState;
+  // prevVideoState = videoState;
   videoState = state.data;
   // console.log('state:', videoState);
   // console.log('prev state:', prevVideoState);
 
   if (videoState === 1) {
-    toggleBtn.value = true;
+    togglePlay.value = true;
     interval = window.setInterval(() => {
       if (rangeSlider.value[1] >= rangeSlider.value[2]) {
         clearInterval(interval);
@@ -268,16 +290,18 @@ const stateChange = state => {
     }, 5);
   }
   if (videoState !== 1) {
-    toggleBtn.value = false;
+    togglePlay.value = false;
     clearInterval(interval);
   }
   // new video loaded
   if (videoState === 5) {
     duration.value = player.value.getDuration();
+    sliderMin.value = 0;
+    sliderMax.value = duration.value;
     setTimeout(() => {
-      rangeSlider.value[0] = 0;
-      rangeSlider.value[1] = 0;
-      rangeSlider.value[2] = duration.value;
+      rangeSlider.value[0] = sliderMin.value;
+      rangeSlider.value[1] = sliderMin.value;
+      rangeSlider.value[2] = sliderMax.value;
     }, 50);
   }
 };
@@ -297,6 +321,18 @@ const togglePlayer = () => {
       player.value.seekTo(rangeSlider.value[0], true);
     }
     player.value.playVideo();
+  }
+};
+
+const toggleZoom = ref(false);
+const sliderZoom = toggleValue => {
+  toggleZoom.value = toggleValue;
+  if (toggleZoom.value) {
+    sliderMin.value = rangeSlider.value[0];
+    sliderMax.value = rangeSlider.value[2];
+  } else {
+    sliderMin.value = 0;
+    sliderMax.value = duration.value;
   }
 };
 
@@ -373,8 +409,9 @@ onUpdated(() => {
 #create-container {
   margin-top: 100px;
 }
-#toggleBtn,
-#replayBtn {
+#togglePlay,
+#replayBtn,
+#zoomIn {
   color: #40b9ff !important;
 }
 #saveBtn {

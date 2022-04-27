@@ -58,7 +58,8 @@ body {
   background: rgb(255, 89, 89) !important;
   border: 1px solid rgb(255, 89, 89) !important;
 }
-.pi-play {
+.pi-play,
+.pi-search-plus {
   color: #40b9ff !important;
 }
 /* .slider-origin:nth-child(3) .slider-handle {
@@ -78,5 +79,8 @@ body {
 }
 .p-menubar-end {
   margin-right: 15vw;
+}
+.p-tooltip {
+  z-index: 10;
 }
 </style>

@@ -27,6 +27,7 @@ const getters = {
   }
 };
 
+// login process:  setToken -> getUserDetails -> getUserGuilds -> setUserGuildsWithBloop
 // actions
 const actions = {
   resetState({ commit }) {
