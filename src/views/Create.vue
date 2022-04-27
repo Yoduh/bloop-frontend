@@ -196,15 +196,15 @@ const getYoutube = e => {
 };
 
 const onPlayerReady = () => {
+  // console.log('ready');
   duration.value = player.value.getDuration();
 };
-const start = () => {
+const start = (e, i) => {
+  // console.log('start', e, i);
   player.value.pauseVideo();
 };
 const end = (e, i) => {
-  if (i === 1) {
-    player.value.seekTo(rangeSlider.value[1], true);
-  }
+  // console.log('end', e, i);
   // prevent overlapping sliders
   if (i === 0 && rangeSlider.value[0] >= rangeSlider.value[2]) {
     rangeSlider.value[0] =
@@ -214,6 +214,14 @@ const end = (e, i) => {
       rangeSlider.value[2] + 0.1 <= duration.value
         ? rangeSlider.value[2] + 0.1
         : duration.value;
+  }
+  if (i === 1) {
+    player.value.seekTo(rangeSlider.value[1], true);
+    player.value.playVideo();
+  } else {
+    rangeSlider.value[1] = rangeSlider.value[0];
+    player.value.seekTo(rangeSlider.value[1], true);
+    player.value.playVideo();
   }
 };
 const inputStart = e => {
@@ -227,6 +235,9 @@ const inputEnd = e => {
   rangeSlider.value[2] = e.value;
 };
 
+const onError = error => {
+  console.log('youtube error', error);
+};
 /*
 player states:
 -1 (unstarted)
@@ -237,34 +248,14 @@ player states:
 5 (video cued)
 */
 let interval = null;
-const onError = error => {
-  console.log('youtube error', error);
-};
-// to-do: refactor this mess
 const stateChange = state => {
   prevVideoState = videoState;
   videoState = state.data;
   // console.log('state:', videoState);
   // console.log('prev state:', prevVideoState);
-  if (videoState === 3 && prevVideoState === 3) {
-    // wtf are you doing (reset to start because youtube messed up)
-    player.value.seekTo(rangeSlider.value[0], true);
-  }
-  if (videoState === 3 && prevVideoState === -1) {
-    player.value.seekTo(rangeSlider.value[1], true);
-  }
-  // play back from beginning
-  if (videoState === 1 && prevVideoState === 0) {
-    rangeSlider.value[1] = rangeSlider.value[0];
-    player.value.seekTo(rangeSlider.value[0], true);
-  }
+
   if (videoState === 1) {
     toggleBtn.value = true;
-    if (rangeSlider.value[1] >= rangeSlider.value[2]) {
-      rangeSlider.value[1] = rangeSlider.value[0];
-      player.value.seekTo(rangeSlider.value[0], true);
-      return;
-    }
     interval = window.setInterval(() => {
       if (rangeSlider.value[1] >= rangeSlider.value[2]) {
         clearInterval(interval);
@@ -276,11 +267,9 @@ const stateChange = state => {
         Math.floor(player.value.getCurrentTime() * 100) / 100;
     }, 5);
   }
-  if (videoState !== 1 && interval) {
-    clearInterval(interval);
-  }
-  if (videoState === 2 || videoState === 0) {
+  if (videoState !== 1) {
     toggleBtn.value = false;
+    clearInterval(interval);
   }
   // new video loaded
   if (videoState === 5) {
