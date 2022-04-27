@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>yo</h1>
+    <h1>Authorizing...</h1>
   </div>
 </template>
 
@@ -19,7 +19,6 @@ export default {
       axios
         .post(`${import.meta.env.VITE_API}/getToken?code=${route.query.code}`)
         .then(res => {
-          console.log('result', res);
           store.dispatch('user/setToken', res.data);
         })
         .catch(e => {

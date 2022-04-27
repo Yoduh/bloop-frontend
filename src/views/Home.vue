@@ -1,4 +1,10 @@
 <template>
+  <img
+    alt="Vue logo"
+    src="../assets/logo.jpeg"
+    class="mt-6"
+    style="border-radius: 50%"
+  />
   <h1 class="display-2 font-weight-bold mb-3">Bloop</h1>
   <Button v-if="!user.id" label="Login" class="m-4" @click="login()"></Button>
   <Button v-else label="Logout" class="m-4" @click="logout()"></Button>
@@ -63,7 +69,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState, mapActions, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import SoundList from '../components/SoundList.vue';
 import { sortByKey } from '../helpers/util';
 
@@ -80,17 +86,12 @@ export default {
   computed: {
     ...mapState({ user: state => state.user }),
     ...mapState('guild', ['sounds']),
-    ...mapGetters('user', ['getUserGuildIds']),
     guildIcon(guild) {
       return `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.jpg`;
     }
   },
   methods: {
-    ...mapActions('user', [
-      'getUserDetails',
-      'setUserGuildsWithBloop',
-      'resetState'
-    ]),
+    ...mapActions('user', ['resetState']),
     ...mapActions('guild', ['setGuild', 'getSounds']),
     getChannels() {
       this.setGuild(this.selectedGuild);
@@ -140,7 +141,9 @@ export default {
         name: name,
         guildId: this.selectedGuild.id,
         channelId: this.selectedChannel,
-        username: this.user.username
+        username: this.user.username,
+        userId: this.user.id,
+        userAvatar: this.user.avatar
       };
       axios
         .post(`${import.meta.env.VITE_API}/sound`, payload, {
@@ -151,10 +154,7 @@ export default {
             })
           }
         })
-        // .then(res => {
-        //   console.log('res', res);
-        // })
-        // toast for when bot can't play sound in empty voice channel
+        // error toast that includes response message
         .catch(error => {
           if (error.response?.data?.message) {
             this.$toast.add({
@@ -172,34 +172,6 @@ export default {
               life: 3000
             });
           }
-        });
-    }
-  },
-  async mounted() {
-    // after logging in, get user details
-    if (this.user.access_token && !this.user.id) {
-      await this.getUserDetails();
-      // immediately get user's joined servers that also contain Bloop bot
-      axios
-        .post(
-          `${import.meta.env.VITE_API}/servers`,
-          {
-            guilds: this.getUserGuildIds
-          },
-          {
-            headers: {
-              Authorization: JSON.stringify({
-                id: this.user.id,
-                access_token: this.user.access_token
-              })
-            }
-          }
-        )
-        .then(res => {
-          this.setUserGuildsWithBloop(res.data);
-        })
-        .catch(e => {
-          console.log(e);
         });
     }
   }
