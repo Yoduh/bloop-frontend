@@ -17,7 +17,7 @@
     class="grid flex align-items-center justify-content-center"
     style="height: 80px"
   >
-    <div class="col-2 h-full">
+    <div class="sm:col-5 md:col-4 lg:col-2 h-full">
       <!-- `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.jpg` -->
       <Dropdown
         class="w-full h-full flex align-items-center"
@@ -44,7 +44,7 @@
         </template>
       </Dropdown>
     </div>
-    <div class="col-2 h-full">
+    <div class="sm:col-5 md:col-4 lg:col-2 h-full">
       <Dropdown
         class="w-full h-full flex align-items-center"
         v-model="selectedChannel"
@@ -130,10 +130,6 @@ export default {
     },
     logout() {
       this.resetState();
-      this.channels = [];
-      this.selectedChannel = '';
-      this.guildsWithBloop = [];
-      this.selectedGuild = null;
       localStorage.clear();
     },
     playSound(name) {
@@ -173,6 +169,19 @@ export default {
             });
           }
         });
+    }
+  },
+  watch: {
+    user: {
+      handler(newUser) {
+        if (newUser.id === '') {
+          this.channels = [];
+          this.selectedChannel = '';
+          this.guildsWithBloop = [];
+          this.selectedGuild = null;
+        }
+      },
+      deep: true
     }
   }
 };

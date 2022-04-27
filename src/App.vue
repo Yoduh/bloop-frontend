@@ -2,44 +2,13 @@
 import { onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
 import Nav from './components/Nav.vue';
-import axios from 'axios';
 
 const store = useStore();
-
 const user = computed(() => store.state.user);
 
-const getUserGuildIds = computed(() => store.getters['user/getUserGuildIds']);
-
-if (user.value.id === '' && localStorage.token) {
-  store.dispatch('user/setToken', JSON.parse(localStorage.token));
-}
-
 onMounted(async () => {
-  if (user.value.access_token && !user.value.id) {
-    await store.dispatch('user/getUserDetails');
-    // immediately get user's joined servers that also contain Bloop bot
-    axios
-      .post(
-        `${import.meta.env.VITE_API}/servers`,
-        {
-          guilds: getUserGuildIds.value
-        },
-        {
-          headers: {
-            Authorization: JSON.stringify({
-              id: user.value.id,
-              access_token: user.value.access_token
-            })
-          }
-        }
-      )
-      .then(res => {
-        console.log('res.data', res.data);
-        store.dispatch('user/setUserGuildsWithBloop', res.data);
-      })
-      .catch(e => {
-        console.log(e);
-      });
+  if (user.value.id === '' && localStorage.token) {
+    store.dispatch('user/setToken', JSON.parse(localStorage.token));
   }
 });
 </script>

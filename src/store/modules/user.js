@@ -33,13 +33,18 @@ const actions = {
     commit('resetState');
     commit('guild/resetState', null, { root: true });
   },
-  setToken({ commit }, token) {
+  setToken({ commit, dispatch }, token) {
     // send token to backend to validate future requests
     localStorage.token = JSON.stringify(token);
-    axios.post(`${import.meta.env.VITE_API}/setToken`, token).catch(e => {
-      console.log('e', e);
-    });
-    commit('setToken', token);
+    return axios
+      .post(`${import.meta.env.VITE_API}/setToken`, token)
+      .then(() => {
+        commit('setToken', token);
+        dispatch('getUserDetails');
+      })
+      .catch(e => {
+        console.log('e', e);
+      });
   },
   getUserDetails({ commit, dispatch, state }) {
     // fetch the user data
@@ -58,25 +63,44 @@ const actions = {
         return dispatch('getUserGuilds');
       });
   },
-  getUserGuilds({ commit, state }) {
+  getUserGuilds({ commit, state, dispatch }) {
     return axios
       .get('https://discordapp.com/api/users/@me/guilds', {
         headers: { Authorization: `Bearer ${state.access_token}` }
       })
       .then(res => {
-        commit(
-          'setUserGuilds',
-          res.data.map(g => {
-            let link = defaultImage;
-            if (g.icon) {
-              link = `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.jpg`;
+        let formattedGuilds = res.data.map(g => {
+          let link = defaultImage;
+          if (g.icon) {
+            link = `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.jpg`;
+          }
+          return {
+            ...g,
+            image: link
+          };
+        });
+        commit('setUserGuilds', formattedGuilds);
+        axios
+          .post(
+            `${import.meta.env.VITE_API}/servers`,
+            {
+              guilds: state.guilds.map(g => g.id)
+            },
+            {
+              headers: {
+                Authorization: JSON.stringify({
+                  id: state.id,
+                  access_token: state.access_token
+                })
+              }
             }
-            return {
-              ...g,
-              image: link
-            };
+          )
+          .then(res => {
+            dispatch('setUserGuildsWithBloop', res.data);
           })
-        );
+          .catch(e => {
+            console.log('get servers errors', e);
+          });
       })
       .catch(e => {
         console.log('get guilds error', e);

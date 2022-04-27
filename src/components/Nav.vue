@@ -13,12 +13,14 @@
       <Button
         v-if="!user.id"
         label="Login"
+        icon="pi pi-sign-in"
         class="p-button-text"
         @click="login"
       ></Button>
       <Button
         v-else
         label="Logout"
+        icon="pi pi-sign-out"
         class="p-button-text"
         @click="logout"
       ></Button>
@@ -42,7 +44,8 @@ const items = ref([
   {
     label: 'Create New Sound',
     icon: 'pi pi-fw pi-cloud-upload',
-    to: '/create'
+    to: '/create',
+    visible: () => user.value.id !== ''
   }
 ]);
 
@@ -59,11 +62,7 @@ const login = () => {
   );
 };
 const logout = () => {
-  this.resetState();
-  this.channels = [];
-  this.selectedChannel = '';
-  this.guildsWithBloop = [];
-  this.selectedGuild = null;
+  store.dispatch('user/resetState');
   localStorage.clear();
 };
 </script>
