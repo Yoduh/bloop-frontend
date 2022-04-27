@@ -1,66 +1,25 @@
 <template>
-  <img
-    alt="Vue logo"
-    src="../assets/logo.jpeg"
-    class="mt-6"
-    style="border-radius: 50%"
-  />
-  <h1 class="display-2 font-weight-bold mb-3">Bloop</h1>
-  <Button v-if="!user.id" label="Login" class="m-4" @click="login()"></Button>
-  <Button v-else label="Logout" class="m-4" @click="logout()"></Button>
-  <p>
-    Choose a server and channel (only servers you and Bloop Bot share will
-    appear), then send a sound bite
-  </p>
-  <div
-    v-if="user.guilds"
-    class="grid flex align-items-center justify-content-center"
-    style="height: 80px"
-  >
-    <div class="sm:col-5 md:col-4 lg:col-2 h-full">
-      <!-- `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.jpg` -->
-      <Dropdown
-        class="w-full h-full flex align-items-center"
-        v-model="selectedGuild"
-        :options="user.guildsWithBloop"
-        optionLabel="name"
-        placeholder="Select a Server"
-        @change="getChannels"
-      >
-        <template v-slot:value="slotProps">
-          <div class="guild-item guild-item-value" v-if="slotProps.value">
-            <img :src="slotProps.value.image" style="border-radius: 50%" />
-            <div>{{ slotProps.value.name }}</div>
-          </div>
-          <span v-else>
-            {{ slotProps.placeholder }}
-          </span>
-        </template>
-        <template v-slot:option="slotProps">
-          <div class="guild-item">
-            <img :src="slotProps.option.image" style="border-radius: 50%" />
-            <div>{{ slotProps.option.name }}</div>
-          </div>
-        </template>
-      </Dropdown>
-    </div>
-    <div class="sm:col-5 md:col-4 lg:col-2 h-full">
-      <Dropdown
-        class="w-full h-full flex align-items-center"
-        v-model="selectedChannel"
-        :options="channels"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="Select a Channel"
-      />
-    </div>
+  <div v-if="!user.id" class="home-container">
+    <img
+      alt="Bloop logo"
+      src="../assets/logo.jpeg"
+      class="mt-6"
+      style="border-radius: 50%"
+    />
+    <h1 class="display-2 font-weight-bold mb-3">Bloop</h1>
+    <Button
+      label="Login"
+      icon="pi pi-sign-in"
+      class="m-4"
+      @click="login()"
+    ></Button>
   </div>
-  <div v-if="selectedChannel !== ''" class="mt-7">
-    <div class="mt-4">
+  <div v-else class="home-container">
+    <div>
       Click an image below to play the sound bite in your selected channel
     </div>
     <SoundList
-      :sounds="sounds"
+      :sounds="guild.sounds"
       @playSound="playSound"
       @getSounds="getSounds()"
     />
@@ -71,51 +30,21 @@
 import axios from 'axios';
 import { mapState, mapActions } from 'vuex';
 import SoundList from '../components/SoundList.vue';
-import { sortByKey } from '../helpers/util';
 
 export default {
   name: 'Home',
   components: { SoundList },
   data() {
     return {
-      channels: [],
-      selectedChannel: '',
-      selectedGuild: null
+      channels: []
     };
   },
   computed: {
     ...mapState({ user: state => state.user }),
-    ...mapState('guild', ['sounds']),
-    guildIcon(guild) {
-      return `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.jpg`;
-    }
+    ...mapState({ guild: state => state.guild })
   },
   methods: {
-    ...mapActions('user', ['resetState']),
-    ...mapActions('guild', ['setGuild', 'getSounds']),
-    getChannels() {
-      this.setGuild(this.selectedGuild);
-      this.channels = [];
-      axios
-        .post(
-          `${import.meta.env.VITE_API}/channels`,
-          {
-            userId: this.user.id,
-            guildId: this.selectedGuild.id
-          },
-          {
-            headers: {
-              Authorization: JSON.stringify({
-                id: this.user.id,
-                access_token: this.user.access_token
-              })
-            }
-          }
-        )
-        .then(res => {
-          this.channels = sortByKey(res.data, 'name');
-        });
-    },
+    ...mapActions('guild', ['getSounds']),
     login() {
       window.open(
         `https://discord.com/oauth2/authorize?` +
@@ -128,15 +57,21 @@ export default {
         `_self`
       );
     },
-    logout() {
-      this.resetState();
-      localStorage.clear();
-    },
     playSound(name) {
+      if (this.guild.id === '' || this.guild.selectedChannel === '') {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            'Must choose a server AND channel in the navigation bar before sending a sound',
+          life: 3000
+        });
+        return;
+      }
       let payload = {
         name: name,
-        guildId: this.selectedGuild.id,
-        channelId: this.selectedChannel,
+        guildId: this.guild.id,
+        channelId: this.guild.selectedChannel,
         username: this.user.username,
         userId: this.user.id,
         userAvatar: this.user.avatar
@@ -170,24 +105,14 @@ export default {
           }
         });
     }
-  },
-  watch: {
-    user: {
-      handler(newUser) {
-        if (newUser.id === '') {
-          this.channels = [];
-          this.selectedChannel = '';
-          this.guildsWithBloop = [];
-          this.selectedGuild = null;
-        }
-      },
-      deep: true
-    }
   }
 };
 </script>
 
 <style scoped>
+.home-container {
+  margin-top: 1rem;
+}
 .p-dropdown {
   width: 14rem;
 }

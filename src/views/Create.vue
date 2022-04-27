@@ -409,10 +409,14 @@ onUpdated(() => {
 #create-container {
   margin-top: 100px;
 }
-#togglePlay,
-#replayBtn,
+#replayBtn {
+  color: #31d39d !important;
+}
 #zoomIn {
   color: #40b9ff !important;
+}
+#togglePlay {
+  color: #ec7171;
 }
 #saveBtn {
   background-color: #40b9ff !important;

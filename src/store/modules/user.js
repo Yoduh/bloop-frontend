@@ -27,7 +27,7 @@ const getters = {
   }
 };
 
-// login process:  setToken -> getUserDetails -> getUserGuilds -> setUserGuildsWithBloop
+// login process:  setToken -> getUserDetails -> getUserGuilds -> setUserGuildsWithBloop -> getSounds
 // actions
 const actions = {
   resetState({ commit }) {
@@ -56,6 +56,7 @@ const actions = {
       .then(res => {
         localStorage.id = res.data.id;
         commit('setUserDetails', res.data);
+        dispatch('guild/getSounds', null, { root: true });
       })
       .catch(e => {
         console.log('get user error', e);

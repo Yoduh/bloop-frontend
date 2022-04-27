@@ -1,5 +1,5 @@
 <template>
-  <div v-if="sounds" class="card">
+  <div class="card">
     <div class="features">
       <span class="p-input-icon-left">
         <i class="pi pi-search" />
@@ -16,8 +16,8 @@
       :value="filteredSounds"
       :layout="layout"
       :paginator="true"
-      :rows="24"
-      :rowsPerPageOptions="[24, 48, 96]"
+      :rows="12"
+      :rowsPerPageOptions="[12, 24, 96]"
       :sortOrder="sortOrder"
       :sortField="sortField"
     >

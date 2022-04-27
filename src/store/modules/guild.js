@@ -5,7 +5,8 @@ const getDefaultState = () => {
     id: '',
     name: '',
     avatar: '',
-    // channels: [],
+    channels: [],
+    selectedChannel: '',
     sounds: []
   };
 };
@@ -24,11 +25,17 @@ const actions = {
   resetState({ commit }) {
     commit('resetState');
   },
-  setGuild({ commit, dispatch, rootState }, guild) {
+  setGuild({ commit, rootState }, guild) {
     let userGuild = rootState.user.guilds.find(g => g.id === guild.id);
     commit('setGuild', userGuild);
-    dispatch('getSounds');
   },
+  setChannels({ commit }, channels) {
+    commit('setChannels', channels);
+  },
+  setSelectedChannel({ commit }, channels) {
+    commit('setSelectedChannel', channels);
+  },
+  // this is a guild action for one day when sounds are tied to specific servers...
   getSounds({ commit, rootState }) {
     return axios
       .get(`${import.meta.env.VITE_API}/sounds`, {
@@ -58,6 +65,12 @@ const mutations = {
     state.name = guild.name;
     state.avatar = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.jpg`;
     // state.channels = guild.channels;
+  },
+  setChannels(state, channels) {
+    state.channels = channels;
+  },
+  setSelectedChannel(state, channel) {
+    state.selectedChannel = channel;
   },
   setSounds(state, sounds) {
     state.sounds = sounds;

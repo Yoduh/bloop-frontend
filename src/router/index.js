@@ -3,6 +3,13 @@ import Home from '../views/Home.vue';
 import Create from '../views/Create.vue';
 import AuthHandler from '../components/AuthHandler.vue';
 
+const redirectHome = (to, from, next) => {
+  if (to.query.error) {
+    next('/');
+  }
+  next();
+};
+
 const routes = [
   {
     path: '/',
@@ -17,7 +24,8 @@ const routes = [
   {
     path: '/auth/redirect',
     name: 'AuthHandler',
-    component: AuthHandler
+    component: AuthHandler,
+    beforeEnter: [redirectHome]
   }
 ];
 

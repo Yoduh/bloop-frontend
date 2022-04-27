@@ -20,9 +20,16 @@ onMounted(async () => {
 </template>
 
 <style>
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 body {
   margin: 0px;
-  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   background-color: #23272a;
@@ -33,13 +40,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #f6f6f6;
-  margin-top: 60px;
   background-color: #23272a;
 }
 .p-menubar {
-  position: fixed;
-  top: 0;
-  width: 100%;
   /* 11 under toast message z-index, 1 under modal overlay */
   z-index: 1099;
 }
@@ -58,9 +61,11 @@ body {
   background: rgb(255, 89, 89) !important;
   border: 1px solid rgb(255, 89, 89) !important;
 }
-.pi-play,
 .pi-search-plus {
   color: #40b9ff !important;
+}
+#togglePlay .pi-play {
+  color: #ec7171 !important;
 }
 /* .slider-origin:nth-child(3) .slider-handle {
   display: none;
@@ -74,11 +79,13 @@ body {
       var(--slider-handle-ring-color, #cacaca30),
     var(--slider-handle-shadow, 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.32));
 }
-.p-menubar-start {
-  margin-left: 15vw;
-}
-.p-menubar-end {
-  margin-right: 15vw;
+@media (min-width: 1700px) {
+  .p-menubar-start {
+    margin-left: 15vw;
+  }
+  .p-menubar-end {
+    margin-right: 15vw;
+  }
 }
 .p-tooltip {
   z-index: 10;
