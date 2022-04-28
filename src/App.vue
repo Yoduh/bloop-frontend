@@ -90,4 +90,8 @@ body {
 .p-tooltip {
   z-index: 10;
 }
+.pi-question-circle {
+  font-size: 1.9rem !important;
+  color: rgb(224, 202, 127);
+}
 </style>

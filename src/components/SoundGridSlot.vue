@@ -1,7 +1,7 @@
 <template>
   <div class="sound-grid-item card">
     <div class="sound-grid-item-content">
-      <div class="sound-grid-item-top">
+      <div class="sound-grid-item-top mt-0">
         <h2 class="mr-2">{{ sound.data.name }}</h2>
       </div>
       <div class="img-container" @click="$emit('playSound', sound.data.name)">
@@ -11,30 +11,26 @@
           )}/mqdefault.jpg`"
           :alt="sound.data.name"
           class="img-sound"
-          width="150"
-          height="150"
         />
         <div class="img-hover">
-          <i class="pi pi-send" style="font-size: 4rem; color: #a4e48a"></i>
+          <i class="pi pi-send" style="font-size: 3rem; color: #fff"></i>
         </div>
       </div>
-      <div class="sound-description">
-        {{ description(sound.data.description) }}
-      </div>
     </div>
-    <div class="sound-grid-item-bottom mt-1">
+    <div class="sound-grid-item-bottom mt-2">
       <Button
+        icon="pi pi-question-circle"
         class="p-button-rounded p-button-text"
-        @click="gotoYoutube(sound.data.link, sound.data.start)"
-        v-tooltip.top="'Source'"
-      >
-        <img src="../assets/yt-icon.png" width="50" class="mr-2" />
-      </Button>
+        @click="$emit('openModal', sound.data)"
+        v-tooltip.top="'Details'"
+        style="padding: 0; width: inherit; height: inherit"
+      ></Button>
       <Button
         icon="pi pi-play"
-        class="p-button-success p-button-rounded p-button-outlined"
+        class="p-button-success p-button-rounded p-button-outlined p-button-text"
         @click="previewSound(sound.data.name)"
         v-tooltip.top="'Preview'"
+        style="height: 2rem; width: 2rem"
       ></Button>
     </div>
   </div>
@@ -42,7 +38,7 @@
 
 <script>
 export default {
-  name: 'Sound',
+  name: 'SoundGridSlot',
   props: {
     sound: {
       type: Object,
@@ -54,10 +50,6 @@ export default {
   methods: {
     previewSound(name) {
       new Audio(`https://yoduh.dev/${name}.opus`).play();
-    },
-    description(text) {
-      if (text === '') return 'No description available';
-      else return text;
     },
     gotoYoutube(link, start) {
       window.open(`${link}&t=${this.timestampToSeconds(start)}`);
@@ -86,8 +78,13 @@ export default {
   background-color: #1e1e1e;
 }
 img {
-  border-radius: 20% !important;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 .text {
@@ -98,6 +95,11 @@ img {
 }
 .img-container {
   position: relative;
+  height: 0;
+  display: inline-block;
+  overflow: hidden;
+  width: 56%;
+  padding-bottom: 56%;
 }
 .img-container:hover .img-sound {
   cursor: pointer;
@@ -109,7 +111,7 @@ img {
   opacity: 1;
 }
 .img-hover {
-  opacity: 0;
+  opacity: 0.6;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -130,16 +132,11 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 0rem;
 }
 .sound-grid-item-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.sound-description {
-  margin-top: 15px;
-  font-style: italic;
-  height: 2em;
 }
 </style>

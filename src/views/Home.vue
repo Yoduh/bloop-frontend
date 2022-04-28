@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!user.id" class="home-container">
+  <div v-if="!user.id" class="home-container pt-1">
     <img
       alt="Bloop logo"
       src="../assets/logo.jpeg"
@@ -14,7 +14,7 @@
       @click="login()"
     ></Button>
   </div>
-  <div v-else class="home-container">
+  <div v-else class="home-container pt-1">
     <div>
       Click an image below to play the sound bite in your selected channel
     </div>
@@ -110,9 +110,6 @@ export default {
 </script>
 
 <style scoped>
-.home-container {
-  margin-top: 1rem;
-}
 .p-dropdown {
   width: 14rem;
 }

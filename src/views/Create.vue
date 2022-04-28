@@ -360,7 +360,7 @@ const save = e => {
           String(rangeSlider.value[0]),
           String(rangeSlider.value[2])
         ],
-        userId: user.value.id
+        username: user.value.username
       };
       axios
         .post(`${import.meta.env.VITE_API}/add`, payload, {

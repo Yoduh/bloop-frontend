@@ -15,6 +15,7 @@ import Tooltip from 'primevue/tooltip';
 import InputNumber from 'primevue/inputnumber';
 import Menubar from 'primevue/menubar';
 import Dialog from 'primevue/dialog';
+import Textarea from 'primevue/textarea';
 
 import 'primevue/resources/themes/md-dark-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -36,6 +37,7 @@ app.component('InputText', InputText);
 app.component('InputNumber', InputNumber);
 app.component('Menubar', Menubar);
 app.component('Dialog', Dialog);
+app.component('Textarea', Textarea);
 
 app.directive('tooltip', Tooltip);
 

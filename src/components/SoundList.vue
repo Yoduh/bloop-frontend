@@ -16,8 +16,8 @@
       :value="filteredSounds"
       :layout="layout"
       :paginator="true"
-      :rows="12"
-      :rowsPerPageOptions="[12, 24, 96]"
+      :rows="24"
+      :rowsPerPageOptions="[24, 64, 128]"
       :sortOrder="sortOrder"
       :sortField="sortField"
     >
@@ -61,20 +61,27 @@
       </template>
 
       <template v-slot:grid="slotProps">
-        <div class="col-12 md:col-2">
-          <Sound :sound="slotProps" @playSound="emitSound" />
+        <div class="soundGridSlot sm:col-6 md:col-3">
+          <SoundGridSlot
+            :sound="slotProps"
+            @playSound="emitSound"
+            @openModal="openModal"
+          />
         </div>
       </template>
     </DataView>
   </div>
+  <SoundModal v-model="modal" :soundDetails="soundDetails" />
 </template>
 
 <script>
-import Sound from '../components/Sound.vue';
+import SoundGridSlot from '../components/SoundGridSlot.vue';
+import SoundModal from '../components/SoundModal.vue';
 
 export default {
   name: 'SoundList',
-  components: { Sound },
+  emits: ['playSound', 'getSounds'],
+  components: { SoundGridSlot, SoundModal },
   props: {
     sounds: {
       type: Array,
@@ -87,6 +94,8 @@ export default {
     return {
       soundFilter: '',
       layout: 'grid',
+      soundDetails: {},
+      modal: false,
       sortKey: null,
       sortOrder: null,
       sortField: null
@@ -130,6 +139,10 @@ export default {
         summary: 'Sounds Refreshed!',
         life: 3000
       });
+    },
+    openModal(soundDetails) {
+      this.soundDetails = { ...soundDetails };
+      this.modal = true;
     }
   }
 };
@@ -147,35 +160,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-/* @media screen and (max-width: 576px) {
-  .sound-list-item {
-    flex-direction: column;
-    align-items: center;
 
-    img {
-      margin: 2rem 0;
-    }
-
-    .sound-list-detail {
-      text-align: center;
-    }
-
-    .sound-price {
-      align-self: center;
-    }
-
-    .sound-list-action {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sound-list-action {
-      margin-top: 2rem;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
+@media (min-width: 1300px) {
+  .soundGridSlot {
+    width: 12.5%;
   }
-} */
+}
 </style>
