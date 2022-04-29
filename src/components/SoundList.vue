@@ -4,14 +4,17 @@
       :value="filteredSounds"
       :layout="layout"
       :paginator="true"
-      :rows="24"
+      :rows="layout === 'list' ? 900 : 24"
       :rowsPerPageOptions="[24, 64, 128]"
       :sortOrder="sortOrder"
       :sortField="sortField"
     >
       <template v-slot:header>
-        <div class="grid justify-content-between align-items-center">
-          <div class="col-2" style="text-align: left">
+        <div
+          class="grid align-items-center justify-content-start"
+          style="position: relative"
+        >
+          <div class="col-12 md:col-6 lg:col-4 xl:col-3 flex-order-0">
             <Dropdown
               v-model="sortKey"
               class="w-full"
@@ -21,19 +24,9 @@
               @change="onSortChange($event)"
             />
           </div>
-          <div class="col-auto mx-3 flex justify-content-start">
-            <h3>
-              Click an image below to play the sound bite in your selected
-              channel
-            </h3>
-          </div>
-          <div class="col-auto flex align-items-center justify-content-end">
-            <Button
-              label="Refresh List"
-              class="mr-5"
-              icon="pi pi-sync"
-              @click="refreshSounds()"
-            ></Button>
+          <div
+            class="col-12 md:col-6 lg:col-4 xl:col-2 flex-order-1 xl:flex-order-2"
+          >
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText
@@ -43,36 +36,38 @@
               />
             </span>
           </div>
-          <!-- <div class="col-6" style="text-align: right">
-            <DataViewLayoutOptions v-model="layout" />
-          </div> -->
-        </div>
-      </template>
-
-      <template v-slot:list="slotProps">
-        <div class="col-12">
-          <div class="sound-list-item">
-            <img
-              src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"
-              :alt="slotProps.data.name"
-            />
-            <div class="sound-list-detail">
-              <div class="sound-name">{{ slotProps.data.name }}</div>
-              <div class="sound-description">
-                {{ slotProps.data.description }}
-              </div>
-              <i class="pi pi-youtube sound-category-icon"></i
-              ><span class="sound-category">{{ slotProps.data.link }}</span>
-            </div>
-            <div class="sound-list-action">
-              <Button icon="pi pi-play" label="Play Sound"></Button>
-            </div>
+          <div
+            class="col-12 lg:col-4 xl:col-2 flex-order-2 xl:flex-order-3 flex justify-content-center xl:justify-content-end"
+          >
+            <Button
+              class="mr-5"
+              icon="pi pi-sync"
+              @click="refreshSounds()"
+              v-tooltip.top="'Refresh Sound List'"
+            ></Button>
+            <DataViewLayoutOptions v-model="layout" style="float: right" />
+          </div>
+          <div class="col-12 xl:col-5 flex-order-3 xl:flex-order-1 text-center">
+            <h3>
+              Click an image below to play the sound bite in your selected
+              channel
+            </h3>
           </div>
         </div>
       </template>
 
+      <template v-slot:list="slotProps">
+        <div class="soundListSlot col-7 h-6rem" style="border: none">
+          <SoundListSlot
+            :sound="slotProps"
+            @playSound="emitSound"
+            @openModal="openModal"
+          />
+        </div>
+      </template>
+
       <template v-slot:grid="slotProps">
-        <div class="soundGridSlot sm:col-6 md:col-3">
+        <div class="soundGridSlot col-12 sm:col-6 md:col-3">
           <SoundGridSlot
             :sound="slotProps"
             @playSound="emitSound"
@@ -87,12 +82,13 @@
 
 <script>
 import SoundGridSlot from '../components/SoundGridSlot.vue';
+import SoundListSlot from '../components/SoundListSlot.vue';
 import SoundModal from '../components/SoundModal.vue';
 
 export default {
   name: 'SoundList',
   emits: ['playSound', 'getSounds'],
-  components: { SoundGridSlot, SoundModal },
+  components: { SoundGridSlot, SoundListSlot, SoundModal },
   props: {
     sounds: {
       type: Array,
@@ -165,7 +161,6 @@ export default {
 
 <style scoped>
 .card {
-  padding: 1rem;
   box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 1px 3px 0 rgba(0, 0, 0, 0.12);
   border-radius: 4px;

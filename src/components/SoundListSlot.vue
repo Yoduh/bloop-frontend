@@ -1,5 +1,5 @@
 <template>
-  <div class="sound-grid-item card h-100" style="position: relative">
+  <div class="sound-list-item card h-full pb-0" style="position: relative">
     <Button
       icon="pi pi-ellipsis-v"
       class="p-button-rounded p-button-text"
@@ -7,21 +7,33 @@
       @click="toggle"
     />
     <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
-    <div class="sound-grid-item-content">
-      <div class="sound-grid-item-top mt-0">
-        <h2>{{ sound.data.name }}</h2>
-      </div>
-      <div class="img-container" @click="$emit('playSound', sound.data.name)">
+    <div class="grid align-items-center h-full w-full">
+      <div
+        class="col-1 img-container"
+        @click="$emit('playSound', sound.data.name)"
+      >
         <img
           :src="`https://img.youtube.com/vi/${sound.data.link.slice(
             -11
           )}/mqdefault.jpg`"
           :alt="sound.data.name"
-          class="img-sound"
+          class="img-sound mt-1 ml-1"
         />
         <div class="img-hover">
-          <i class="pi pi-send" style="font-size: 3rem; color: #fff"></i>
+          <i class="pi pi-send" style="font-size: 2rem; color: #fff"></i>
         </div>
+      </div>
+      <div
+        class="col-6 flex flex-column justify-content-start align-items-start h-full ml-3"
+      >
+        <h2 style="margin: 0">{{ sound.data.name }}</h2>
+        <i style="font-size: 0.8rem">{{ sound.data.description }}</i>
+      </div>
+      <div
+        class="col h-full flex flex-column justify-content-end align-items-end pt-0"
+      >
+        <div>created by: {{ sound.data.user }}</div>
+        <div>duration: {{ sound.data.duration }}s</div>
       </div>
     </div>
   </div>
@@ -29,7 +41,7 @@
 
 <script>
 export default {
-  name: 'SoundGridSlot',
+  name: 'SoundListSlot',
   props: {
     sound: {
       type: Object,
@@ -88,18 +100,15 @@ export default {
 </script>
 
 <style scoped>
-.sound-grid-item.card {
+.sound-list-item.card {
   background-color: #1e1e1e;
   padding: 0.5rem;
 }
 img {
   border-radius: 50%;
-  width: 100%;
-  height: 100%;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 .text {
@@ -110,11 +119,6 @@ img {
 }
 .img-container {
   position: relative;
-  height: 0;
-  display: inline-block;
-  overflow: hidden;
-  width: 56%;
-  padding-bottom: 56%;
 }
 .img-container:hover .img-sound {
   cursor: pointer;
@@ -139,17 +143,17 @@ img {
   color: rgba(255, 255, 255, 0.87);
 }
 
-.sound-grid-item {
+.sound-list-item {
   margin: 0.5rem;
   border: 1px solid var(--surface-border);
 }
-.sound-grid-item-top {
+.sound-list-item-top {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 0rem;
 }
-.sound-grid-item-bottom {
+.sound-list-item-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -74,7 +74,7 @@ export default {
         userAvatar: this.user.avatar
       };
       axios
-        .post(`${import.meta.env.VITE_API}/sound`, payload, {
+        .post(`${import.meta.env.VITE_API}/play`, payload, {
           headers: {
             Authorization: JSON.stringify({
               id: this.user.id,

@@ -94,4 +94,7 @@ body {
   font-size: 1.9rem !important;
   color: rgb(224, 202, 127);
 }
+.p-dataview-content .p-grid {
+  justify-content: center !important;
+}
 </style>
