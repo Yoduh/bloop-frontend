@@ -1,8 +1,15 @@
 <template>
-  <div class="sound-grid-item card">
+  <div class="sound-grid-item card" style="position: relative">
+    <Button
+      icon="pi pi-ellipsis-v"
+      class="p-button-rounded p-button-text"
+      style="color: #fff; position: absolute; top: 0rem; right: 0rem"
+      @click="toggle"
+    />
+    <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
     <div class="sound-grid-item-content">
       <div class="sound-grid-item-top mt-0">
-        <h2 class="mr-2">{{ sound.data.name }}</h2>
+        <h2>{{ sound.data.name }}</h2>
       </div>
       <div class="img-container" @click="$emit('playSound', sound.data.name)">
         <img
@@ -17,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div class="sound-grid-item-bottom mt-2">
+    <!-- <div class="sound-grid-item-bottom mt-2">
       <Button
         icon="pi pi-question-circle"
         class="p-button-rounded p-button-text"
@@ -32,7 +39,7 @@
         v-tooltip.top="'Preview'"
         style="height: 2rem; width: 2rem"
       ></Button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -47,7 +54,30 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      items: [
+        {
+          label: 'Preview',
+          icon: 'pi pi-volume-up',
+          command: () => {
+            this.previewSound(this.sound.data.name);
+          }
+        },
+        {
+          label: 'Details',
+          icon: 'pi pi-info-circle',
+          command: () => {
+            this.$emit('openModal', this.sound.data);
+          }
+        }
+      ]
+    };
+  },
   methods: {
+    toggle(event) {
+      this.$refs.menu.toggle(event);
+    },
     previewSound(name) {
       new Audio(`https://yoduh.dev/${name}.opus`).play();
     },
@@ -76,6 +106,7 @@ export default {
 <style scoped>
 .sound-grid-item.card {
   background-color: #1e1e1e;
+  padding: 0.5rem;
 }
 img {
   border-radius: 50%;

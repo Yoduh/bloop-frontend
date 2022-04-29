@@ -15,9 +15,6 @@
     ></Button>
   </div>
   <div v-else class="home-container pt-1">
-    <div>
-      Click an image below to play the sound bite in your selected channel
-    </div>
     <SoundList
       :sounds="guild.sounds"
       @playSound="playSound"

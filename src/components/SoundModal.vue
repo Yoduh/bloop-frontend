@@ -36,11 +36,10 @@
         ></Textarea>
       </div>
     </div>
-    <div class="grid justify-content-center w-full h-full mt-2">
-      <div class="col-2">start: <br />{{ details.start }}</div>
-      <div class="col-2">duration: <br />{{ details.duration }}s</div>
-      <div class="col-3">added by: <br />{{ details.user }}</div>
-      <div class="col-3">
+    <div class="grid justify-content-center w-full h-full mt-2 text-center">
+      <div class="col-4">duration: <br />{{ details.duration }}s</div>
+      <div class="col-4">added by: <br />{{ details.user }}</div>
+      <div class="col-4">
         created on: <br />{{ details.created.split(',')[0] }}
       </div>
     </div>

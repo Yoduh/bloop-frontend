@@ -1,17 +1,5 @@
 <template>
   <div class="card">
-    <div class="features">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" />
-        <InputText type="text" v-model="soundFilter" placeholder="Filter" />
-      </span>
-
-      <Button
-        label="Refresh Sounds"
-        class="ml-5"
-        @click="refreshSounds()"
-      ></Button>
-    </div>
     <DataView
       :value="filteredSounds"
       :layout="layout"
@@ -21,22 +9,45 @@
       :sortOrder="sortOrder"
       :sortField="sortField"
     >
-      <!-- <template v-slot:header>
-        <div class="grid grid-nogutter">
-          <div class="col-6" style="text-align: left">
+      <template v-slot:header>
+        <div class="grid justify-content-between align-items-center">
+          <div class="col-2" style="text-align: left">
             <Dropdown
               v-model="sortKey"
+              class="w-full"
               :options="sortOptions"
               optionLabel="label"
-              placeholder="Sort By Price"
+              placeholder="Sort"
               @change="onSortChange($event)"
             />
           </div>
-          <div class="col-6" style="text-align: right">
-            <DataViewLayoutOptions v-model="layout" />
+          <div class="col-auto mx-3 flex justify-content-start">
+            <h3>
+              Click an image below to play the sound bite in your selected
+              channel
+            </h3>
           </div>
+          <div class="col-auto flex align-items-center justify-content-end">
+            <Button
+              label="Refresh List"
+              class="mr-5"
+              icon="pi pi-sync"
+              @click="refreshSounds()"
+            ></Button>
+            <span class="p-input-icon-left">
+              <i class="pi pi-search" />
+              <InputText
+                type="text"
+                v-model="soundFilter"
+                placeholder="Filter"
+              />
+            </span>
+          </div>
+          <!-- <div class="col-6" style="text-align: right">
+            <DataViewLayoutOptions v-model="layout" />
+          </div> -->
         </div>
-      </template> -->
+      </template>
 
       <template v-slot:list="slotProps">
         <div class="col-12">
@@ -98,11 +109,13 @@ export default {
       modal: false,
       sortKey: null,
       sortOrder: null,
-      sortField: null
-      //   sortOptions: [
-      //     { label: 'Sort Name High to Low', value: '!name' },
-      //     { label: 'Sort Name Low to High', value: 'name' }
-      //   ]
+      sortField: null,
+      sortOptions: [
+        { label: 'Name (A-Z)', value: 'name' },
+        { label: 'Name (Z-A)', value: '!name' },
+        { label: 'Created Date (Newest)', value: '!created' },
+        { label: 'Created Date (Oldest)', value: 'created' }
+      ]
     };
   },
   computed: {
@@ -118,6 +131,8 @@ export default {
     onSortChange(event) {
       const value = event.value.value;
       const sortValue = event.value;
+      console.log('value', event.value.value);
+      console.log('sortValue', event.value);
 
       if (value.indexOf('!') === 0) {
         this.sortOrder = -1;
