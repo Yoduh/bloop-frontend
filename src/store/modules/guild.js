@@ -47,7 +47,10 @@ const actions = {
         }
       })
       .then(res => {
-        commit('setSounds', res.data);
+        let formatted = res.data.map(s => {
+          return { ...s, createdAt: new Date(s.createdAt).getTime() };
+        });
+        commit('setSounds', formatted);
       })
       .catch(e => {
         console.log('get sounds error', e);

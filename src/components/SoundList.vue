@@ -109,8 +109,8 @@ export default {
       sortOptions: [
         { label: 'Name (A-Z)', value: 'name' },
         { label: 'Name (Z-A)', value: '!name' },
-        { label: 'Created Date (Newest)', value: '!created' },
-        { label: 'Created Date (Oldest)', value: 'created' }
+        { label: 'Created Date (Newest)', value: '!createdAt' },
+        { label: 'Created Date (Oldest)', value: 'createdAt' }
       ]
     };
   },
@@ -127,8 +127,6 @@ export default {
     onSortChange(event) {
       const value = event.value.value;
       const sortValue = event.value;
-      console.log('value', event.value.value);
-      console.log('sortValue', event.value);
 
       if (value.indexOf('!') === 0) {
         this.sortOrder = -1;

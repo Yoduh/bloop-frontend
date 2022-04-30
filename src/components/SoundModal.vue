@@ -40,9 +40,7 @@
       <div class="col-4">duration: <br />{{ details.duration }}s</div>
       <div class="col-4">added by: <br />{{ details.user }}</div>
       <div class="col-4">
-        created on: <br />{{
-          new Date(details.createdAt.split(',')[0]).toLocaleDateString()
-        }}
+        created on: <br />{{ new Date(details.createdAt).toLocaleDateString() }}
       </div>
     </div>
     <template v-slot:footer>
