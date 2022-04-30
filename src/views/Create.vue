@@ -378,6 +378,7 @@ const save = e => {
             detail: res.data,
             life: 3000
           });
+          store.dispatch('guild/getSounds');
           router.push('/');
         })
         .catch(e => {

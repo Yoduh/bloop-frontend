@@ -71,10 +71,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { sortByKey } from '../helpers/util';
 
 const store = useStore();
+const router = useRouter();
 const user = computed(() => store.state.user);
 
 const items = ref([
@@ -140,6 +142,7 @@ const login = () => {
 const logout = () => {
   store.dispatch('user/resetState');
   localStorage.clear();
+  router.replace('/');
 };
 </script>
 

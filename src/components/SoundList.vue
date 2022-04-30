@@ -33,6 +33,7 @@
                 type="text"
                 v-model="soundFilter"
                 placeholder="Filter"
+                class="pr-0"
               />
             </span>
           </div>
@@ -104,8 +105,8 @@ export default {
       soundDetails: {},
       modal: false,
       sortKey: null,
-      sortOrder: null,
-      sortField: null,
+      sortOrder: 1,
+      sortField: 'name',
       sortOptions: [
         { label: 'Name (A-Z)', value: 'name' },
         { label: 'Name (Z-A)', value: '!name' },

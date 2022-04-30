@@ -42,8 +42,14 @@ body {
   color: #f6f6f6;
   background-color: #23272a;
 }
+.p-toast {
+  z-index: 8999;
+}
+.p-dialog-mask {
+  z-index: 7999;
+}
 .p-menubar {
-  /* 11 under toast message z-index, 1 under modal overlay */
+  /* 1 under modal overlay */
   z-index: 1099;
 }
 
