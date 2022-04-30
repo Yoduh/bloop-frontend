@@ -64,24 +64,6 @@ export default {
     },
     previewSound(name) {
       new Audio(`https://yoduh.dev/${name}.opus`).play();
-    },
-    gotoYoutube(link, start) {
-      window.open(`${link}&t=${this.timestampToSeconds(start)}`);
-    },
-    timestampToSeconds(timestamp) {
-      // timestamp given is already in seconds
-      if (!timestamp.includes(':')) {
-        return Number(timestamp);
-      }
-      let ms = 0;
-      if (timestamp.includes('.')) {
-        let split = timestamp.split('.');
-        timestamp = split[0];
-        ms = Number('0.' + split[1]);
-      }
-      return parseInt(
-        timestamp.split(':').reduce((acc, time) => 60 * acc + +time) + ms
-      );
     }
   }
 };

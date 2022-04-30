@@ -40,7 +40,9 @@
       <div class="col-4">duration: <br />{{ details.duration }}s</div>
       <div class="col-4">added by: <br />{{ details.user }}</div>
       <div class="col-4">
-        created on: <br />{{ details.created.split(',')[0] }}
+        created on: <br />{{
+          new Date(details.createdAt.split(',')[0]).toLocaleDateString()
+        }}
       </div>
     </div>
     <template v-slot:footer>
@@ -50,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, computed } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -68,25 +70,9 @@ const modal = computed({
   set: value => emit('update:modelValue', value)
 });
 
-const timestampToSeconds = timestamp => {
-  if (!timestamp) return;
-  if (!String(timestamp.includes(':'))) {
-    return Number(timestamp);
-  }
-  let ms = 0;
-  if (timestamp.includes('.')) {
-    let split = timestamp.split('.');
-    timestamp = split[0];
-    ms = Number('0.' + split[1]);
-  }
-  return parseInt(
-    timestamp.split(':').reduce((acc, time) => 60 * acc + +time) + ms
-  );
-};
-
 const details = computed(() => props.soundDetails);
-const start = computed(() => timestampToSeconds(details.value.start));
-const end = computed(() => Math.ceil(start.value + details.value.duration));
+const start = computed(() => Math.floor(details.value.start)); // youtube player doesnt work with milliseconds
+const end = computed(() => Math.ceil(details.value.end));
 const player = ref(null);
 const playerOptions = ref({
   start: start,
