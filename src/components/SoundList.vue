@@ -33,7 +33,7 @@
                 type="text"
                 v-model="soundFilter"
                 placeholder="Filter"
-                class="pr-0"
+                class="w-full"
               />
             </span>
           </div>

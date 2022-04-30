@@ -9,7 +9,7 @@
     <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
     <div class="sound-grid-item-content">
       <div class="sound-grid-item-top mt-0">
-        <h2>{{ sound.data.name }}</h2>
+        <h2 class="sound-name">{{ sound.data.name }}</h2>
       </div>
       <div class="img-container" @click="$emit('playSound', sound.data.name)">
         <img
@@ -129,11 +129,18 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 0rem;
+  line-height: 2.6rem;
+  padding-right: 1.5rem;
 }
 .sound-grid-item-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.sound-name {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0;
 }
 </style>
