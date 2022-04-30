@@ -1,5 +1,12 @@
 <template>
   <div class="sound-grid-item card h-100" style="position: relative">
+    <ToggleButton
+      onIcon="pi pi-bookmark-fill"
+      offIcon="pi pi-bookmark"
+      v-model="bookmarked"
+      class="p-button-rounded p-button-text bookmark p-button-sm"
+      style="position: absolute; top: 0.1rem; left: 0rem"
+    />
     <Button
       icon="pi pi-ellipsis-v"
       class="p-button-rounded p-button-text"
@@ -9,7 +16,9 @@
     <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
     <div class="sound-grid-item-content">
       <div class="sound-grid-item-top mt-0">
-        <h2 class="sound-name">{{ sound.data.name }}</h2>
+        <h2 class="sound-name">
+          {{ sound.data.name }}
+        </h2>
       </div>
       <div class="img-container" @click="$emit('playSound', sound.data.name)">
         <img
@@ -28,6 +37,10 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { mapActions } from 'vuex';
+import { mapState } from 'vuex';
+
 export default {
   name: 'SoundGridSlot',
   props: {
@@ -58,9 +71,48 @@ export default {
       ]
     };
   },
+  computed: {
+    ...mapState({ user: state => state.user }),
+    bookmarked: {
+      get() {
+        return this.user?.favoriteSounds?.includes(this.sound.data._id);
+      },
+      set() {
+        this.bookmark();
+      }
+    }
+  },
   methods: {
     toggle(event) {
       this.$refs.menu.toggle(event);
+    },
+    ...mapActions('user', ['setFavoriteSounds']),
+    ...mapActions('guild', ['setFavoriteSound']),
+    bookmark() {
+      axios
+        .post(
+          `${import.meta.env.VITE_API}/setFavorite`,
+          {
+            soundId: this.sound.data._id
+          },
+          {
+            headers: {
+              Authorization: JSON.stringify({
+                id: this.user.id,
+                access_token: this.user.access_token
+              })
+            }
+          }
+        )
+        .then(res => {
+          if (res.status === 200) {
+            this.setFavoriteSounds(res.data.favorites);
+            this.setFavoriteSound({
+              id: this.sound.data._id,
+              isFavorite: !this.sound.data.isFavorite
+            });
+          }
+        });
     },
     previewSound(name) {
       new Audio(`https://yoduh.dev/${name}.opus`).play();
@@ -120,7 +172,13 @@ img {
 .p-button {
   color: rgba(255, 255, 255, 0.87);
 }
-
+.bookmark:hover {
+  background: #dbca3f36 !important;
+  border: none !important;
+}
+.bookmark:focus {
+  border: none !important;
+}
 .sound-grid-item {
   margin: 0.5rem;
   border: 1px solid var(--surface-border);
@@ -130,7 +188,8 @@ img {
   align-items: center;
   justify-content: center;
   line-height: 2.6rem;
-  padding-right: 1.5rem;
+  padding-right: 1.8rem;
+  padding-left: 1.8rem;
 }
 .sound-grid-item-bottom {
   display: flex;

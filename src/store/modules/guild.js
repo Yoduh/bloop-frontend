@@ -48,13 +48,20 @@ const actions = {
       })
       .then(res => {
         let formatted = res.data.map(s => {
-          return { ...s, createdAt: new Date(s.createdAt).getTime() };
+          return {
+            ...s,
+            createdAt: new Date(s.createdAt).getTime(),
+            isFavorite: rootState.user.favoriteSounds.includes(s._id)
+          };
         });
         commit('setSounds', formatted);
       })
       .catch(e => {
         console.log('get sounds error', e);
       });
+  },
+  setFavoriteSound({ commit }, payload) {
+    commit('setFavoriteSound', payload);
   }
 };
 
@@ -77,6 +84,10 @@ const mutations = {
   },
   setSounds(state, sounds) {
     state.sounds = sounds;
+  },
+  setFavoriteSound(state, payload) {
+    let sound = state.sounds.filter(s => s._id === payload.id)[0];
+    sound.isFavorite = payload.isFavorite;
   }
 };
 

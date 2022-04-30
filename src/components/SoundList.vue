@@ -110,6 +110,7 @@ export default {
       sortOptions: [
         { label: 'Name (A-Z)', value: 'name' },
         { label: 'Name (Z-A)', value: '!name' },
+        { label: 'Favorites', value: '!isFavorite' },
         { label: 'Created Date (Newest)', value: '!createdAt' },
         { label: 'Created Date (Oldest)', value: 'createdAt' }
       ]

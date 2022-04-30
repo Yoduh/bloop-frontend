@@ -139,10 +139,6 @@ img {
   text-align: center;
 }
 
-.p-button {
-  color: rgba(255, 255, 255, 0.87);
-}
-
 .sound-list-item {
   margin: 0.5rem;
   border: 1px solid var(--surface-border);

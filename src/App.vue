@@ -100,6 +100,15 @@ body {
   font-size: 1.9rem !important;
   color: rgb(224, 202, 127);
 }
+.pi-bookmark,
+.pi-bookmark-fill {
+  font-size: 1rem !important;
+  color: rgb(224, 202, 127) !important;
+}
+.p-highlight.bookmark {
+  background: none !important;
+  border: none !important;
+}
 .p-dataview-content .p-grid {
   justify-content: center !important;
 }

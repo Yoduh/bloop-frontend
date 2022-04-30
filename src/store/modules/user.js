@@ -14,7 +14,8 @@ const getDefaultState = () => {
     username: '',
     avatar: '',
     guilds: [],
-    guildsWithBloop: []
+    guildsWithBloop: [],
+    favoriteSounds: []
   };
 };
 
@@ -39,8 +40,9 @@ const actions = {
     localStorage.token = JSON.stringify(token);
     return axios
       .post(`${import.meta.env.VITE_API}/setToken`, token)
-      .then(() => {
+      .then(dbUser => {
         commit('setToken', token);
+        dispatch('setFavoriteSounds', dbUser.data.favorites);
         dispatch('getUserDetails');
       })
       .catch(e => {
@@ -114,6 +116,9 @@ const actions = {
     );
     let sortedGuilds = sortByKey(filteredGuilds, 'name');
     commit('setUserGuildsWithBloop', sortedGuilds);
+  },
+  setFavoriteSounds({ commit }, sounds) {
+    commit('setFavoriteSounds', sounds);
   }
 };
 
@@ -139,6 +144,9 @@ const mutations = {
   },
   setUserGuildsWithBloop(state, guilds) {
     state.guildsWithBloop = guilds;
+  },
+  setFavoriteSounds(state, sounds) {
+    state.favoriteSounds = sounds;
   }
 };
 
