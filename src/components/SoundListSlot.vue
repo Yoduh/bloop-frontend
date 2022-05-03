@@ -75,7 +75,7 @@ export default {
       this.$refs.menu.toggle(event);
     },
     previewSound(name) {
-      new Audio(`https://yoduh.dev/${name}.opus`).play();
+      new Audio(`${import.meta.env.VITE_BACKEND}/${name}.opus`).play();
     },
     gotoYoutube(link, start) {
       window.open(`${link}&t=${this.timestampToSeconds(start)}`);

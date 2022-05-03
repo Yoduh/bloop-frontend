@@ -115,7 +115,7 @@ export default {
         });
     },
     previewSound(name) {
-      new Audio(`https://yoduh.dev/${name}.opus`).play();
+      new Audio(`${import.meta.env.VITE_BACKEND}/${name}.opus`).play();
     }
   }
 };
