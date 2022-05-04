@@ -3,6 +3,8 @@ import YoutubeIframe from '@techassi/vue-youtube-iframe';
 import Slider from '@vueform/slider';
 import App from './App.vue';
 import PrimeVue from 'primevue/config';
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmDialog from 'primevue/confirmdialog';
 import Button from 'primevue/button';
 import ToggleButton from 'primevue/togglebutton';
 import Dropdown from 'primevue/dropdown';
@@ -27,7 +29,13 @@ import router from './router/index';
 import store from './store/index';
 
 const app = createApp(App);
-app.use(PrimeVue).use(router).use(store).use(ToastService).use(YoutubeIframe);
+app
+  .use(PrimeVue)
+  .use(router)
+  .use(store)
+  .use(ToastService)
+  .use(YoutubeIframe)
+  .use(ConfirmationService);
 app.component('Slider', Slider);
 app.component('Button', Button);
 app.component('ToggleButton', ToggleButton);
@@ -42,6 +50,7 @@ app.component('Menu', Menu);
 app.component('Menubar', Menubar);
 app.component('Dialog', Dialog);
 app.component('Textarea', Textarea);
+app.component('ConfirmDialog', ConfirmDialog);
 
 app.directive('tooltip', Tooltip);
 

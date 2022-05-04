@@ -8,25 +8,32 @@
       :rowsPerPageOptions="[24, 64, 128]"
       :sortOrder="sortOrder"
       :sortField="sortField"
+      :first="jumpTo"
     >
       <template v-slot:header>
         <div
-          class="grid align-items-center justify-content-start"
+          class="grid align-items-center justify-content-around"
           style="position: relative"
         >
-          <div class="col-12 md:col-6 lg:col-4 xl:col-3 flex-order-0">
+          <div class="col-12 text-center">
+            <h3>
+              Click an image below to play the sound bite in your selected
+              channel
+            </h3>
+          </div>
+        </div>
+        <div class="grid justify-content-around -mt-2">
+          <div class="col-auto mt-2">
             <Dropdown
               v-model="sortKey"
-              class="w-full"
+              class="w-15rem"
               :options="sortOptions"
               optionLabel="label"
               placeholder="Sort"
               @change="onSortChange($event)"
             />
           </div>
-          <div
-            class="col-12 md:col-6 lg:col-4 xl:col-2 flex-order-1 xl:flex-order-2"
-          >
+          <div class="col-auto mt-2">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText
@@ -38,8 +45,24 @@
             </span>
           </div>
           <div
-            class="col-12 lg:col-4 xl:col-2 flex-order-2 xl:flex-order-3 flex justify-content-center xl:justify-content-end"
+            class="col-12 xl:col-6 mt-2 flex justify-content-center align-items-center"
           >
+            <div
+              class="alpha-wrapper flex justify-content-center align-items-center flex-wrap"
+            >
+              <span class="alphaSelection" @click="jumpToChar(35)">#</span>
+              <span
+                v-for="i in 26"
+                :key="i"
+                class="alphaSelection"
+                @click="jumpToChar(i + 64)"
+              >
+                {{ String.fromCharCode(i + 64) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="col-auto mt-2">
             <Button
               class="mr-5"
               icon="pi pi-sync"
@@ -48,15 +71,8 @@
             ></Button>
             <DataViewLayoutOptions v-model="layout" style="float: right" />
           </div>
-          <div class="col-12 xl:col-5 flex-order-3 xl:flex-order-1 text-center">
-            <h3>
-              Click an image below to play the sound bite in your selected
-              channel
-            </h3>
-          </div>
         </div>
       </template>
-
       <template v-slot:list="slotProps">
         <div class="soundListSlot col-7 h-6rem" style="border: none">
           <SoundListSlot
@@ -107,6 +123,7 @@ export default {
       sortKey: null,
       sortOrder: 1,
       sortField: 'name',
+      jumpTo: 0,
       sortOptions: [
         { label: 'Name (A-Z)', value: 'name' },
         { label: 'Name (Z-A)', value: '!name' },
@@ -129,6 +146,7 @@ export default {
     onSortChange(event) {
       const value = event.value.value;
       const sortValue = event.value;
+      this.jumpTo = 0;
 
       if (value.indexOf('!') === 0) {
         this.sortOrder = -1;
@@ -154,6 +172,41 @@ export default {
     openModal(soundDetails) {
       this.soundDetails = { ...soundDetails };
       this.modal = true;
+    },
+    delay(ms) {
+      return new Promise(res => setTimeout(res, ms));
+    },
+    async jumpToChar(i) {
+      /* PrimeVue's dataview component doesnt expose the items as they are currently sorted.
+      Therefore setting the paginator page like this only works with the default A-Z sort.
+      However, changing the sort back to the default ALSO sets the page to 0 (uncontrollably),
+      and if I set the page without at least SOME delay, the set fails.
+      */
+      if (this.sortField !== 'name' || this.sortOrder !== 1) {
+        this.sortKey = {
+          label: 'Name (A-Z)',
+          value: 'name'
+        };
+        this.sortField = 'name';
+        this.sortOrder = 1;
+        await this.delay(0); // the time to resolve a promise even with 0 delay is itself enough of a delay. GROSS.
+      }
+      let c = String.fromCharCode(i);
+      if (c === '#') {
+        this.jumpTo = 0;
+        return;
+      }
+      let index = this.filteredSounds.findIndex(s =>
+        s.name.startsWith(c.toLowerCase())
+      );
+      if (index === -1) {
+        if (c === 'A') index = 0;
+        else {
+          this.jumpToChar(i - 1);
+          return;
+        }
+      }
+      this.jumpTo = index;
     }
   }
 };
@@ -169,6 +222,19 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.alpha-wrapper {
+  line-height: 38px;
+}
+.alphaSelection {
+  color: rgb(199, 199, 199);
+  cursor: pointer;
+  transition: font-size 100ms;
+  min-width: 28px;
+}
+.alphaSelection:hover {
+  color: white;
+  font-size: 2rem;
 }
 
 @media (min-width: 1300px) {
