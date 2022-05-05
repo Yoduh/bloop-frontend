@@ -316,10 +316,13 @@ const togglePlayer = () => {
   if (videoState === 1) {
     player.value.pauseVideo();
   } else {
-    if (rangeSlider.value[1] >= rangeSlider.value[2]) {
+    if (
+      rangeSlider.value[1] <= rangeSlider.value[0] ||
+      rangeSlider.value[1] >= rangeSlider.value[2]
+    ) {
       rangeSlider.value[1] = rangeSlider.value[0];
+      player.value.seekTo(rangeSlider.value[0], true);
     }
-    player.value.seekTo(rangeSlider.value[0], true);
     player.value.playVideo();
   }
 };
