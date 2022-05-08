@@ -29,7 +29,12 @@
             style="background: inherit; border-color: #0000"
           />
         </div>
-        <h3 class="m-0">{{ details.name }}</h3>
+        <h3 v-if="descriptionLock">{{ details.name }}</h3>
+        <InputText
+          v-else
+          class="m-0 center-text text-center"
+          v-model="details.name"
+        ></InputText>
         <div style="flex: 1"></div>
       </div>
       <div class="col-12 flex justify-content-center align-items-center">
@@ -50,13 +55,21 @@
       </div>
     </div>
     <template v-slot:footer>
-      <div class="flex justify-content-between">
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          class="p-button-danger"
-          @click="deleteSound()"
-        />
+      <div class="flex justify-content-between mt-2">
+        <div>
+          <Button
+            label="Edit Clip"
+            icon="pi pi-pencil"
+            class="p-button-warning"
+            @click="editSound()"
+          />
+          <Button
+            label="Delete"
+            icon="pi pi-trash"
+            class="p-button-danger"
+            @click="deleteSound()"
+          />
+        </div>
         <Button label="OK" icon="pi pi-check" @click="update()" />
       </div>
     </template>
@@ -69,6 +82,7 @@ import { ref, watch, computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { objectsEqual } from '../helpers/util';
 
@@ -127,22 +141,25 @@ const store = useStore();
 const user = computed(() => store.state.user);
 
 const update = () => {
+  console.log('prop details', props.soundDetails);
+  console.log('details value', details.value);
   if (!objectsEqual(details.value, props.soundDetails)) {
+    let payload = { name: props.soundDetails.name };
+    if (details.value.name !== props.soundDetails.name) {
+      payload.newName = details.value.name;
+    }
+    if (details.value.description !== props.soundDetails.description) {
+      payload.newDescription = details.value.description;
+    }
     axios
-      .post(
-        `${import.meta.env.VITE_API}/update`,
-        {
-          details: details.value
-        },
-        {
-          headers: {
-            Authorization: JSON.stringify({
-              id: user.value.id,
-              access_token: user.value.access_token
-            })
-          }
+      .post(`${import.meta.env.VITE_API}/update`, payload, {
+        headers: {
+          Authorization: JSON.stringify({
+            id: user.value.id,
+            access_token: user.value.access_token
+          })
         }
-      )
+      })
       .then(res => {
         toast.add({
           severity: 'info',
@@ -219,6 +236,14 @@ const deleteSound = () => {
         life: 3000
       });
     }
+  });
+};
+
+const router = useRouter();
+const editSound = () => {
+  store.dispatch('sound/setSound', details.value);
+  router.push({
+    name: 'Create'
   });
 };
 

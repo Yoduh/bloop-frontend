@@ -9,7 +9,7 @@
     <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
     <div class="grid align-items-center h-full w-full">
       <div
-        class="col-1 img-container"
+        class="col-auto img-container"
         @click="$emit('playSound', sound.data.name)"
       >
         <img

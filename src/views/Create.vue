@@ -1,6 +1,6 @@
 <template>
   <div id="create-container">
-    <div class="grid mt-5 flex justify-content-center">
+    <div class="grid flex justify-content-center">
       <div class="sm:col-10 md:col-7 lg:col-6 xl:col-4">
         <span class="p-input-icon-left w-full">
           <i class="pi pi-search" />
@@ -8,6 +8,7 @@
             class="w-full mb-2"
             type="text"
             v-model="url"
+            :disabled="editSound"
             placeholder="Enter Youtube URL"
             @keypress="getYoutube"
           />
@@ -15,7 +16,7 @@
       </div>
     </div>
     <youtube-iframe
-      :video-id="'AtDij1C-704'"
+      :video-id="videoId"
       :player-width="500"
       :player-height="300"
       :no-cookie="true"
@@ -119,6 +120,25 @@
     </div>
   </div>
   <Dialog
+    v-if="editSound"
+    :header="`Overwrite '${editSound.name}' with new clip?`"
+    v-model:visible="modal"
+    class="sm:w-full md:w-5 lg:w-3"
+    :modal="true"
+  >
+    <template v-slot:footer>
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-danger"
+        @click="modal = false"
+        autofocus
+      />
+      <Button label="OK" icon="pi pi-check" @click="save" autofocus />
+    </template>
+  </Dialog>
+  <Dialog
+    v-else
     header="Choose a name for your sound"
     v-model:visible="modal"
     class="sm:w-full md:w-5 lg:w-3"
@@ -132,6 +152,12 @@
       @keypress="save"
     />
     <template v-slot:footer>
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        @click="modal = false"
+        autofocus
+      />
       <Button label="OK" icon="pi pi-check" @click="save" autofocus />
     </template>
   </Dialog>
@@ -139,7 +165,7 @@
 
 <script setup>
 import { ref, onUpdated, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { useStore } from 'vuex';
 import axios from 'axios';
@@ -196,13 +222,23 @@ const sliderOptions = {
     }
   ]
 };
+const store = useStore();
+const storeSound = computed(() => store.state.sound);
+const editSound = storeSound.value ? storeSound.value.details : null;
+if (editSound) {
+  url.value = editSound.link;
+}
+
 const player = ref(null);
-const duration = ref(0);
+const videoId = editSound ? editSound.link.slice(-11) : 'AtDij1C-704';
+const duration = ref(editSound ? editSound.duration : 0);
 const togglePlay = ref(false);
 
-const rangeSlider = ref([0, 0, 9]);
+const rangeSlider = ref(
+  editSound ? [editSound.start, editSound.start, editSound.end] : [0, 0, 9]
+);
 const sliderMin = ref(0);
-const sliderMax = ref(9);
+const sliderMax = ref(editSound ? editSound.duration : 9);
 
 let videoState = -1;
 // let prevVideoState = null;
@@ -315,6 +351,9 @@ const replay = () => {
 const togglePlayer = () => {
   if (videoState === 1) {
     player.value.pauseVideo();
+  } else if (videoState === 0) {
+    player.value.seekTo(rangeSlider.value[0], true);
+    player.value.playVideo();
   } else {
     if (
       rangeSlider.value[1] <= rangeSlider.value[0] ||
@@ -342,13 +381,12 @@ const sliderZoom = toggleValue => {
 const toast = useToast();
 const modal = ref(false);
 const soundName = ref('');
-const store = useStore();
 const router = useRouter();
 const user = computed(() => store.state.user);
 
 const save = e => {
   if (e.key === 'Enter' || e.type === 'click') {
-    if (soundName.value === '') {
+    if (!editSound && soundName.value === '') {
       toast.add({
         severity: 'error',
         summary: 'Error',
@@ -358,15 +396,19 @@ const save = e => {
     } else {
       let payload = {
         args: [
-          soundName.value,
+          editSound ? editSound.name : soundName.value,
           player.value.getVideoUrl(),
           String(rangeSlider.value[0]),
           String(rangeSlider.value[2])
         ],
         username: user.value.username
       };
+      let endpoint = 'add';
+      if (editSound) {
+        endpoint = 'update';
+      }
       axios
-        .post(`${import.meta.env.VITE_API}/add`, payload, {
+        .post(`${import.meta.env.VITE_API}/${endpoint}`, payload, {
           headers: {
             Authorization: JSON.stringify({
               id: user.value.id,
@@ -404,6 +446,13 @@ onUpdated(() => {
   let slider = document.getElementsByClassName('slider-tooltip-top')[1];
   slider.classList.remove('slider-tooltip-top');
   slider.classList.add('slider-tooltip-bottom');
+});
+
+onBeforeRouteLeave(async () => {
+  if (editSound) {
+    await store.dispatch('sound/resetState');
+  }
+  return true;
 });
 </script>
 
