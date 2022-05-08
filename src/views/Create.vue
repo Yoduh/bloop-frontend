@@ -149,8 +149,12 @@
       v-model="soundName"
       class="w-full"
       maxlength="30"
+      aria-describedby="soundName-help"
       @keypress="save"
     />
+    <small v-show="soundName.includes(' ')" id="soundName-help" class="p-error"
+      >Sound name can not have a space.</small
+    >
     <template v-slot:footer>
       <Button
         label="Cancel"
@@ -158,7 +162,13 @@
         @click="modal = false"
         autofocus
       />
-      <Button label="OK" icon="pi pi-check" @click="save" autofocus />
+      <Button
+        label="OK"
+        :disabled="soundName.includes(' ')"
+        icon="pi pi-check"
+        @click="save"
+        autofocus
+      />
     </template>
   </Dialog>
 </template>
