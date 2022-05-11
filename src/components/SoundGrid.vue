@@ -115,7 +115,7 @@ export default {
   data() {
     return {
       soundFilter: '',
-      layout: 'list',
+      layout: 'grid',
       soundList: [...this.sounds],
       soundDetails: {},
       modal: false,
