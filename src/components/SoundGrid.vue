@@ -90,8 +90,8 @@
       @playSound="emitSound"
       @openModal="openModal"
     />
-    <SoundModal v-model="modal" :soundDetails="soundDetails" />
   </div>
+  <SoundModal v-model="modal" :soundDetails="soundDetails" />
 </template>
 
 <script>
@@ -141,7 +141,7 @@ export default {
         this.soundList = [...this.sounds];
         return;
       }
-      let filters = this.soundFilter.split('|').filter(s => s.toLowerCase());
+      let filters = this.soundFilter.split('|').filter(s => s);
       this.soundList = this.sounds.filter(s => {
         return filters.findIndex(f => s.name.includes(f.toLowerCase())) !== -1;
       });
@@ -195,6 +195,7 @@ export default {
       and if I set the page without at least SOME delay, the set fails.
       */
       this.soundFilter = '';
+      this.soundList = [...this.sounds];
       if (this.sortField !== 'name' || this.sortOrder !== 1) {
         this.sortKey = {
           label: 'Name (A-Z)',
@@ -209,7 +210,7 @@ export default {
         this.jumpTo = 0;
         return;
       }
-      let index = this.filteredSounds.findIndex(s =>
+      let index = this.soundList.findIndex(s =>
         s.name.startsWith(c.toLowerCase())
       );
       if (index === -1) {
