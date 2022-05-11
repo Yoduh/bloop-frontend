@@ -20,6 +20,10 @@ import Menu from 'primevue/menu';
 import Menubar from 'primevue/menubar';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';
+import Row from 'primevue/row';
 
 import 'primevue/resources/themes/md-dark-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -51,6 +55,10 @@ app.component('Menubar', Menubar);
 app.component('Dialog', Dialog);
 app.component('Textarea', Textarea);
 app.component('ConfirmDialog', ConfirmDialog);
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.component('ColumnGroup', ColumnGroup);
+app.component('Row', Row);
 
 app.directive('tooltip', Tooltip);
 

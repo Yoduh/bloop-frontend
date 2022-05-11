@@ -5,7 +5,7 @@
         alt="logo"
         src="../assets/logo.jpeg"
         height="40"
-        class="mr-2"
+        class="hidden md:block mr-2"
         style="border-radius: 50%"
       />
     </template>

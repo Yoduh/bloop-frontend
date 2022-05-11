@@ -15,7 +15,8 @@
     ></Button>
   </div>
   <div v-else class="home-container pt-1">
-    <SoundList
+    <SoundGrid
+      v-if="guild.sounds.length > 0"
       :sounds="guild.sounds"
       @playSound="playSound"
       @getSounds="getSounds()"
@@ -26,11 +27,11 @@
 <script>
 import axios from 'axios';
 import { mapState, mapActions } from 'vuex';
-import SoundList from '../components/SoundList.vue';
+import SoundGrid from '../components/SoundGrid.vue';
 
 export default {
   name: 'Home',
-  components: { SoundList },
+  components: { SoundGrid },
   data() {
     return {
       channels: []

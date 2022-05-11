@@ -141,8 +141,6 @@ const store = useStore();
 const user = computed(() => store.state.user);
 
 const update = () => {
-  console.log('prop details', props.soundDetails);
-  console.log('details value', details.value);
   if (!objectsEqual(details.value, props.soundDetails)) {
     let payload = { name: props.soundDetails.name };
     if (details.value.name !== props.soundDetails.name) {

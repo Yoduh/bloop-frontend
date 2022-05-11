@@ -112,4 +112,29 @@ body {
 .p-dataview-content .p-grid {
   justify-content: center !important;
 }
+
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  height: 1em;
+  width: 1em;
+  border-radius: 50em;
+  background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg)
+    no-repeat 50% 50%;
+  background-size: contain;
+  opacity: 0;
+  pointer-events: none;
+}
+
+input[type='search']:focus::-webkit-search-cancel-button {
+  opacity: 0.3;
+  pointer-events: all;
+  filter: invert(1);
+}
+.p-datatable-header {
+  margin-top: 2px;
+  background-color: #23272a !important;
+}
+.p-datatable-wrapper {
+  overflow-x: hidden;
+}
 </style>
