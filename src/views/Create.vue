@@ -1,11 +1,17 @@
 <template>
-  <div id="create-container">
-    <div class="grid flex justify-content-center">
+  <div
+    id="create-container"
+    class="flex flex-column justify-content-center align-items-center"
+  >
+    <h1 v-if="editSound" style="color: #f1f1f1">
+      Editing Sound '{{ editSound.name }}'
+    </h1>
+    <div class="grid flex justify-content-center mb-3 w-full">
       <div class="sm:col-10 md:col-7 lg:col-6 xl:col-4">
         <span class="p-input-icon-left w-full">
           <i class="pi pi-search" />
           <InputText
-            class="w-full mb-2"
+            class="w-full"
             type="text"
             v-model="url"
             :disabled="editSound"
@@ -13,6 +19,7 @@
             @keypress="getYoutube"
           />
         </span>
+        <Button label="Load Video" class="sm:hidden mt-2" @click="getYoutube" />
       </div>
     </div>
     <youtube-iframe
@@ -26,7 +33,7 @@
       @error="onError"
       ref="player"
     ></youtube-iframe>
-    <div class="grid mt-5 flex justify-content-center">
+    <div class="grid mt-5 flex justify-content-center w-11">
       <div class="sm:col-10 md:col-7 lg:col-6 xl:col-4">
         <Slider
           v-model="rangeSlider"
@@ -59,7 +66,7 @@
             icon="pi pi-search-plus"
             @click="sliderZoom(true)"
             v-tooltip.top="
-              'Set min and max slider values to current \'Start\' and \'End\' locations'
+              'Zoom in by setting slider bar length using current \'Start\' and \'End\' locations'
             "
           />
           <Button
@@ -72,7 +79,7 @@
           />
         </div>
         <div
-          class="p-fluid grid formgrid mt-3 start-end-inputs justify-content-between align-items-start"
+          class="p-fluid grid formgrid mt-3 start-end-inputs justify-content-center sm:justify-content-between align-items-start"
         >
           <div
             class="sm:col-5 lg:col-4 xl:col-5 flex flex-column justify-content-start"
@@ -107,7 +114,7 @@
             />
           </div>
         </div>
-        <div class="grid justify-content-center mt-6">
+        <div class="grid justify-content-center my-3">
           <Button
             id="saveBtn"
             label="Save"
@@ -254,8 +261,37 @@ let videoState = -1;
 // let prevVideoState = null;
 
 const getYoutube = e => {
-  if (e.key === 'Enter') {
-    let id = url.value.slice(-11);
+  if (e.key === 'Enter' || e.type === 'click') {
+    /*eslint no-useless-escape: "off"*/
+    let regex =
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
+    let id = url.value.split(regex)[1];
+    if (
+      !id ||
+      [':', '&', '?'].some(el => id.includes(el)) ||
+      id.length !== 11
+    ) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Not a valid Youtube link',
+        life: 3000
+      });
+      return;
+    }
+    if (url.value.split(regex)[2]) {
+      let startTime = url.value.split(regex)[2];
+      if (startTime.includes('t=')) {
+        let seconds = Number(startTime.match(/([0-9]+)/g)[0]);
+
+        player.value.cueVideoById(id, seconds);
+        setTimeout(() => {
+          rangeSlider.value[0] = seconds;
+          rangeSlider.value[1] = seconds;
+        }, 500);
+        return;
+      }
+    }
     player.value.cueVideoById(id);
   }
 };
@@ -470,7 +506,7 @@ onBeforeRouteLeave(async () => {
 
 <style scoped>
 #create-container {
-  margin-top: 100px;
+  margin-top: 2rem;
 }
 #replayBtn {
   color: #31d39d !important;

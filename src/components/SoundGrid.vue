@@ -91,14 +91,18 @@
       @openModal="openModal"
     />
   </div>
-  <SoundModal v-model="modal" :soundDetails="soundDetails" />
+  <SoundModal
+    v-model="modal"
+    :soundDetails="soundDetails"
+    @deleted="refreshSounds('deleted')"
+  />
 </template>
 
 <script>
 import SoundGridSlot from '../components/SoundGridSlot.vue';
 import SoundModal from '../components/SoundModal.vue';
 import SoundTable from '../components/SoundTable.vue';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'SoundList',
@@ -136,6 +140,7 @@ export default {
     ...mapState({ user: state => state.user })
   },
   methods: {
+    ...mapActions('guild', ['getSounds']),
     onFilterChange() {
       if (this.soundFilter === '') {
         this.soundList = [...this.sounds];
@@ -173,13 +178,23 @@ export default {
     emitSound(sound) {
       this.$emit('playSound', sound);
     },
-    refreshSounds() {
-      this.$emit('getSounds');
-      this.$toast.add({
-        severity: 'success',
-        summary: 'Sounds Refreshed!',
-        life: 3000
-      });
+    async refreshSounds(reason) {
+      await this.getSounds();
+      this.soundList = [...this.sounds];
+      if (reason && reason === 'deleted') {
+        this.$toast.add({
+          severity: 'info',
+          summary: 'Delete',
+          detail: 'Sound Removed!',
+          life: 3000
+        });
+      } else {
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Sounds Refreshed!',
+          life: 3000
+        });
+      }
     },
     openModal(soundDetails) {
       this.soundDetails = { ...soundDetails };

@@ -96,7 +96,7 @@ const props = defineProps({
     default: () => ({})
   }
 });
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'deleted']);
 const modal = computed({
   get: () => props.modelValue,
   set: value => {
@@ -204,13 +204,9 @@ const deleteSound = () => {
             }
           }
         )
-        .then(res => {
-          toast.add({
-            severity: 'info',
-            summary: 'Confirmed',
-            detail: res.data,
-            life: 3000
-          });
+        .then(() => {
+          modal.value = false;
+          emit('deleted');
         })
         .catch(e => {
           modal.value = false;
@@ -220,10 +216,6 @@ const deleteSound = () => {
             detail: e.response.data,
             life: 3000
           });
-        })
-        .finally(() => {
-          modal.value = false;
-          store.dispatch('guild/getSounds');
         });
     },
     reject: () => {

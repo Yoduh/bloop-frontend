@@ -19,14 +19,13 @@
       v-if="guild.sounds.length > 0"
       :sounds="guild.sounds"
       @playSound="playSound"
-      @getSounds="getSounds()"
     />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 import SoundGrid from '../components/SoundGrid.vue';
 
 export default {
@@ -42,7 +41,6 @@ export default {
     ...mapState({ guild: state => state.guild })
   },
   methods: {
-    ...mapActions('guild', ['getSounds']),
     login() {
       window.open(
         `https://discord.com/oauth2/authorize?` +
