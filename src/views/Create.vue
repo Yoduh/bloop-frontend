@@ -22,22 +22,43 @@
         <Button label="Load Video" class="sm:hidden mt-2" @click="getYoutube" />
       </div>
     </div>
-    <youtube-iframe
-      :video-id="videoId"
-      :player-width="500"
-      :player-height="300"
-      :no-cookie="true"
-      :playerParameters="playerOptions"
-      @ready="onPlayerReady"
-      @state-change="stateChange"
-      @error="onError"
-      ref="player"
-    ></youtube-iframe>
+    <div class="grid flex justify-content-center mb-3 w-full">
+      <youtube-iframe
+        :video-id="videoId"
+        :player-width="500"
+        :player-height="300"
+        :no-cookie="true"
+        :playerParameters="playerOptions"
+        @ready="onPlayerReady"
+        @state-change="stateChange"
+        @error="onError"
+        ref="player"
+        style="position: relative; left: 16px"
+      ></youtube-iframe>
+      <div
+        class="px-3 grid flex-column justify-content-center align-items-center"
+        style="position: relative; left: 16px"
+      >
+        <i class="pi pi-volume-up mb-2"></i>
+        <Slider
+          id="volumeSlider"
+          v-model="volumeSlider"
+          :min="0"
+          :max="100"
+          :step="1"
+          orientation="vertical"
+          direction="rtl"
+          :tooltips="false"
+          :lazy="false"
+          @update="volumeChange"
+        />
+      </div>
+    </div>
     <div class="grid mt-5 flex justify-content-center w-11">
       <div class="sm:col-10 md:col-7 lg:col-6 xl:col-4">
         <Slider
+          id="rangeSlider"
           v-model="rangeSlider"
-          show-tooltip="always"
           :min="sliderMin"
           :max="sliderMax"
           :step="0.01"
@@ -181,11 +202,27 @@
 </template>
 
 <script setup>
-import { ref, onUpdated, computed } from 'vue';
+import { ref, onUpdated, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { useStore } from 'vuex';
 import axios from 'axios';
+
+const resize = () => {
+  if (window.innerWidth < 559) {
+    let width = window.innerWidth * 0.85;
+    player.value.setSize(width, width / 1.6666);
+  } else if (window.innerWidth >= 559) {
+    player.value.setSize(500, 300);
+  }
+};
+onMounted(() => {
+  window.addEventListener('resize', resize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resize);
+  clearInterval(interval);
+});
 
 // move this to utility class
 const toHHMMSS = val => {
@@ -239,6 +276,7 @@ const sliderOptions = {
     }
   ]
 };
+const volumeSlider = ref(100);
 const store = useStore();
 const storeSound = computed(() => store.state.sound);
 const editSound = storeSound.value ? storeSound.value.details : null;
@@ -298,6 +336,7 @@ const getYoutube = e => {
 
 const onPlayerReady = () => {
   // console.log('ready');
+  resize();
   duration.value = player.value.getDuration();
   sliderMax.value = duration.value;
 };
@@ -327,6 +366,9 @@ const end = (e, i) => {
     player.value.seekTo(rangeSlider.value[1], true);
     player.value.playVideo();
   }
+};
+const volumeChange = () => {
+  player.value.setVolume(volumeSlider.value);
 };
 const inputStart = e => {
   if (e.value > rangeSlider.value[2]) return;
@@ -447,6 +489,7 @@ const save = e => {
           String(rangeSlider.value[0]),
           String(rangeSlider.value[2])
         ],
+        volume: volumeSlider.value / 100,
         username: user.value.username
       };
       let endpoint = 'add';
@@ -489,12 +532,13 @@ onUpdated(() => {
   if (document.getElementsByClassName('slider-tooltip-bottom').length > 0) {
     return;
   }
-  let slider = document.getElementsByClassName('slider-tooltip-top')[1];
+  let slider = document.getElementsByClassName('slider-tooltip-top')[2];
   slider.classList.remove('slider-tooltip-top');
   slider.classList.add('slider-tooltip-bottom');
 });
 
 onBeforeRouteLeave(async () => {
+  // player.value.pauseVideo();
   if (editSound) {
     await store.dispatch('sound/resetState');
   }

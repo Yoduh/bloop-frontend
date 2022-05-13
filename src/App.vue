@@ -60,8 +60,18 @@ body {
 .p-dataview-content {
   background-color: #23272a !important;
 }
-.slider-connect:first-child {
+#rangeSlider .slider-connect:first-child {
   background: rgb(255, 89, 89) !important;
+}
+#volumeSlider .slider-connect:first-child {
+  background: rgb(78, 125, 255) !important;
+}
+#volumeSlider {
+  --slider-vertical-height: 170px;
+}
+#volumeSlider .slider-tooltip {
+  background: rgb(32, 91, 255) !important;
+  border: 1px solid rgb(32, 91, 255) !important;
 }
 .slider-origin:nth-child(3) .slider-tooltip {
   background: rgb(255, 89, 89) !important;

@@ -2,19 +2,18 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Create from '../views/Create.vue';
 import AuthHandler from '../components/AuthHandler.vue';
-import store from '../store/index';
 
-const redirectHome = (to, from, next) => {
+const redirectHome = to => {
   if (to.query.error) {
-    next('/');
+    return { name: 'Home' };
   }
-  next();
+  return true;
 };
-const authenticate = (to, from, next) => {
-  if (!store.state.user.id) {
-    next('/');
+const authenticate = () => {
+  if (!localStorage.id) {
+    return { name: 'Home' };
   }
-  next();
+  return true;
 };
 
 const routes = [
