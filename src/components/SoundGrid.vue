@@ -179,6 +179,7 @@ export default {
       this.$emit('playSound', sound);
     },
     async refreshSounds(reason) {
+      this.soundFilter = '';
       await this.getSounds();
       this.soundList = [...this.sounds];
       if (reason && reason === 'deleted') {

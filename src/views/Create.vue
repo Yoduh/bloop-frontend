@@ -282,6 +282,9 @@ const storeSound = computed(() => store.state.sound);
 const editSound = storeSound.value ? storeSound.value.details : null;
 if (editSound) {
   url.value = editSound.link;
+  if (editSound.volume && editSound.volume < 1) {
+    volumeSlider.value = editSound.volume * 100;
+  }
 }
 
 const player = ref(null);
@@ -339,6 +342,9 @@ const onPlayerReady = () => {
   resize();
   duration.value = player.value.getDuration();
   sliderMax.value = duration.value;
+  if (editSound) {
+    player.value.setVolume(editSound.volume * 100);
+  }
 };
 const start = () => {
   // console.log('start', e, i);
@@ -532,7 +538,7 @@ onUpdated(() => {
   if (document.getElementsByClassName('slider-tooltip-bottom').length > 0) {
     return;
   }
-  let slider = document.getElementsByClassName('slider-tooltip-top')[2];
+  let slider = document.getElementsByClassName('slider-tooltip-top')[1];
   slider.classList.remove('slider-tooltip-top');
   slider.classList.add('slider-tooltip-bottom');
 });
