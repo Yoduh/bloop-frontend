@@ -140,9 +140,22 @@ const confirm = useConfirm();
 const store = useStore();
 const user = computed(() => store.state.user);
 
+function isValidName(name) {
+  return /^[a-zA-Z 0-9\~\!\@\$\^\&\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
+}
+
 const update = () => {
   if (!objectsEqual(details.value, props.soundDetails)) {
     let payload = { name: props.soundDetails.name };
+    if (!isValidName(details.value.name)) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid name, try sticking to alphanumeric characters',
+        life: 3000
+      });
+      return;
+    }
     if (details.value.name !== props.soundDetails.name) {
       payload.newName = details.value.name;
     }

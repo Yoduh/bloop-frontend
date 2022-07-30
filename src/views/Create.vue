@@ -478,6 +478,10 @@ const soundName = ref('');
 const router = useRouter();
 const user = computed(() => store.state.user);
 
+function isValidName(name) {
+  return /^[a-zA-Z 0-9\~\!\@\$\^\&\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
+}
+
 const save = e => {
   if (e.key === 'Enter' || e.type === 'click') {
     if (!editSound && soundName.value === '') {
@@ -485,6 +489,13 @@ const save = e => {
         severity: 'error',
         summary: 'Error',
         detail: 'Can not submit blank name',
+        life: 3000
+      });
+    } else if (!isValidName(soundName.value)) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid name, try sticking to alphanumeric characters',
         life: 3000
       });
     } else {
