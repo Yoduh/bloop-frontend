@@ -141,7 +141,7 @@ const store = useStore();
 const user = computed(() => store.state.user);
 
 function isValidName(name) {
-  return /^[a-zA-Z 0-9\~\!\@\$\^\&\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
+  return /^[a-zA-Z 0-9\~\!\@\$\^\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
 }
 
 const update = () => {

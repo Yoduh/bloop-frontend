@@ -141,7 +141,7 @@
             label="Save"
             icon="pi pi-save"
             class="p-button-rounded p-button-lg"
-            @click="modal = true"
+            @click="presave"
           />
         </div>
       </div>
@@ -199,9 +199,15 @@
       />
     </template>
   </Dialog>
+  <DuplicateModal
+    v-model="duplicateModal"
+    :duplicates="dupes"
+    @continueSave="modal = true"
+  />
 </template>
 
 <script setup>
+import DuplicateModal from '../components/DuplicateModal.vue';
 import { ref, onUpdated, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
@@ -479,8 +485,41 @@ const router = useRouter();
 const user = computed(() => store.state.user);
 
 function isValidName(name) {
-  return /^[a-zA-Z 0-9\~\!\@\$\^\&\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
+  return /^[a-zA-Z 0-9\~\!\@\$\^\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
 }
+
+const duplicateModal = ref(false);
+const dupes = ref([]);
+const presave = () => {
+  let regex =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
+  let id = url.value.split(regex)[1];
+  if (typeof id === 'string' && id !== '') {
+    axios
+      .post(
+        `${import.meta.env.VITE_API}/duplicates`,
+        {
+          youtubeId: id
+        },
+        {
+          headers: {
+            Authorization: JSON.stringify({
+              id: user.value.id,
+              access_token: user.value.access_token
+            })
+          }
+        }
+      )
+      .then(res => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          dupes.value = res.data;
+          duplicateModal.value = true;
+        } else {
+          modal.value = true;
+        }
+      });
+  }
+};
 
 const save = e => {
   if (e.key === 'Enter' || e.type === 'click') {
