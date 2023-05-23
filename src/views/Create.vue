@@ -511,7 +511,7 @@ const presave = () => {
         }
       )
       .then(res => {
-        if (Array.isArray(res.data) && res.data.length > 0) {
+        if (!editSound && Array.isArray(res.data) && res.data.length > 0) {
           dupes.value = res.data;
           duplicateModal.value = true;
         } else {
