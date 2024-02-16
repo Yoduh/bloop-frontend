@@ -22,7 +22,7 @@
           @change="onSortChange($event)"
         />
       </div>
-      <div class="col-auto mt-2">
+      <div class="col-auto mt-2 flex align-items-center">
         <span class="p-input-icon-left">
           <i class="pi pi-search" />
           <InputText
@@ -33,6 +33,17 @@
             @input="onFilterChange"
           />
         </span>
+        <i
+          class="pi pi-question-circle"
+          style="font-size: 2rem"
+          v-tooltip="{
+            value: tooltipText,
+            class: 'filterTooltip',
+            escape: true,
+            showDelay: 300,
+            hideDelay: 300
+          }"
+        ></i>
       </div>
       <div
         class="col-12 xl:col-6 mt-2 flex justify-content-center align-items-center"
@@ -133,7 +144,10 @@ export default {
         { label: 'My Favorites', value: '!isFavorite' },
         { label: 'Created by Me', value: 'createdByMe' },
         { label: 'Popular', value: '!playCount' }
-      ]
+      ],
+      tooltipText:
+        'Use vertical bar <strong>|</strong> to separate search terms to return multiple results, e.g. <strong>falstad|redshirt</strong><br><br>' +
+        'Use quotation marks <strong>""</strong> to perform exact search, e.g. <strong>"caly"|"is"|"gay"<strong>'
     };
   },
   computed: {
