@@ -148,7 +148,15 @@ export default {
       }
       let filters = this.soundFilter.split('|').filter(s => s);
       this.soundList = this.sounds.filter(s => {
-        return filters.findIndex(f => s.name.includes(f.toLowerCase())) !== -1;
+        return (
+          filters.findIndex(f => {
+            if (f.startsWith('"') && f.endsWith('"')) {
+              return s.name === f.replaceAll('"', '').toLowerCase();
+            } else {
+              return s.name.includes(f.toLowerCase());
+            }
+          }) !== -1
+        );
       });
     },
     onSortChange(event) {
