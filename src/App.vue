@@ -107,8 +107,18 @@ body {
   z-index: 10;
 }
 .pi-question-circle {
-  font-size: 1.9rem !important;
-  color: rgb(224, 202, 127);
+  margin-left: 5px;
+  font-size: 2rem !important;
+  color: rgba(224, 201, 127, 0.479);
+}
+.pi-question-circle:hover {
+  color: rgba(224, 201, 127);
+}
+.filterTooltip {
+  min-width: 250px !important;
+}
+.filterTooltip .p-tooltip-text {
+  padding: 15px !important;
 }
 .pi-bookmark,
 .pi-bookmark-fill {
