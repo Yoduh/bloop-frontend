@@ -2,6 +2,7 @@
   "name": "quickstart",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "build": "vite build",
     "lint": "vue-cli-service lint",
