@@ -25,10 +25,10 @@
     <div class="grid flex justify-content-center mb-3 w-full">
       <youtube-iframe
         :video-id="videoId"
-        :player-width="500"
-        :player-height="300"
-        :no-cookie="true"
-        :playerParameters="playerOptions"
+        :width="500"
+        :height="300"
+        :cookie="false"
+        :playerVars="playerOptions"
         @ready="onPlayerReady"
         @state-change="stateChange"
         @error="onError"
@@ -208,18 +208,23 @@
 
 <script setup>
 import DuplicateModal from '../components/DuplicateModal.vue';
-import { ref, onUpdated, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onUpdated, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
-import { useStore } from 'vuex';
+import { useUserStore } from '@/stores/user';
+import { useGuildStore } from '@/stores/guild';
+import { useSoundStore } from '@/stores/sound';
 import axios from 'axios';
+
+const guildStore = useGuildStore();
+const soundStore = useSoundStore();
 
 const resize = () => {
   if (window.innerWidth < 559) {
     let width = window.innerWidth * 0.85;
-    player.value.setSize(width, width / 1.6666);
+    player.value.instance.setSize(width, width / 1.6666);
   } else if (window.innerWidth >= 559) {
-    player.value.setSize(500, 300);
+    player.value.instance.setSize(500, 300);
   }
 };
 onMounted(() => {
@@ -283,9 +288,7 @@ const sliderOptions = {
   ]
 };
 const volumeSlider = ref(100);
-const store = useStore();
-const storeSound = computed(() => store.state.sound);
-const editSound = storeSound.value ? storeSound.value.details : null;
+const editSound = soundStore.details;
 if (editSound) {
   url.value = editSound.link;
   if (editSound.volume && editSound.volume < 1) {
@@ -331,7 +334,7 @@ const getYoutube = e => {
       if (startTime.includes('t=')) {
         let seconds = Number(startTime.match(/([0-9]+)/g)[0]);
 
-        player.value.cueVideoById(id, seconds);
+        player.value.instance.cueVideoById(id, seconds);
         setTimeout(() => {
           rangeSlider.value[0] = seconds;
           rangeSlider.value[1] = seconds;
@@ -339,22 +342,22 @@ const getYoutube = e => {
         return;
       }
     }
-    player.value.cueVideoById(id);
+    player.value.instance.cueVideoById(id);
   }
 };
 
 const onPlayerReady = () => {
   // console.log('ready');
   resize();
-  duration.value = player.value.getDuration();
+  duration.value = player.value.instance.getDuration();
   sliderMax.value = duration.value;
   if (editSound) {
-    player.value.setVolume(editSound.volume * 100);
+    player.value.instance.setVolume(editSound.volume * 100);
   }
 };
 const start = () => {
   // console.log('start', e, i);
-  player.value.pauseVideo();
+  player.value.instance.pauseVideo();
 };
 const end = (e, i) => {
   // console.log('end', e, i);
@@ -371,16 +374,16 @@ const end = (e, i) => {
         : sliderMax.value;
   }
   if (i === 1) {
-    player.value.seekTo(rangeSlider.value[1], true);
-    player.value.playVideo();
+    player.value.instance.seekTo(rangeSlider.value[1], true);
+    player.value.instance.playVideo();
   } else {
     rangeSlider.value[1] = rangeSlider.value[0];
-    player.value.seekTo(rangeSlider.value[1], true);
-    player.value.playVideo();
+    player.value.instance.seekTo(rangeSlider.value[1], true);
+    player.value.instance.playVideo();
   }
 };
 const volumeChange = () => {
-  player.value.setVolume(volumeSlider.value);
+  player.value.instance.setVolume(volumeSlider.value);
 };
 const inputStart = e => {
   if (e.value > rangeSlider.value[2]) return;
@@ -417,12 +420,12 @@ const stateChange = state => {
     interval = window.setInterval(() => {
       if (rangeSlider.value[1] >= rangeSlider.value[2]) {
         clearInterval(interval);
-        player.value.pauseVideo();
-        player.value.seekTo(rangeSlider.value[2], true);
+        player.value.instance.pauseVideo();
+        player.value.instance.seekTo(rangeSlider.value[2], true);
         return;
       }
       rangeSlider.value[1] =
-        Math.floor(player.value.getCurrentTime() * 100) / 100;
+        Math.floor(player.value.instance.getCurrentTime() * 100) / 100;
     }, 5);
   }
   if (videoState !== 1) {
@@ -431,7 +434,7 @@ const stateChange = state => {
   }
   // new video loaded
   if (videoState === 5) {
-    duration.value = player.value.getDuration();
+    duration.value = player.value.instance.getDuration();
     sliderMin.value = 0;
     sliderMax.value = duration.value;
     setTimeout(() => {
@@ -444,25 +447,25 @@ const stateChange = state => {
 
 const replay = () => {
   rangeSlider.value[1] = rangeSlider.value[0];
-  player.value.seekTo(rangeSlider.value[0], true);
-  player.value.playVideo();
+  player.value.instance.seekTo(rangeSlider.value[0], true);
+  player.value.instance.playVideo();
 };
 
 const togglePlayer = () => {
   if (videoState === 1) {
-    player.value.pauseVideo();
+    player.value.instance.pauseVideo();
   } else if (videoState === 0) {
-    player.value.seekTo(rangeSlider.value[0], true);
-    player.value.playVideo();
+    player.value.instance.seekTo(rangeSlider.value[0], true);
+    player.value.instance.playVideo();
   } else {
     if (
       rangeSlider.value[1] <= rangeSlider.value[0] ||
       rangeSlider.value[1] >= rangeSlider.value[2]
     ) {
       rangeSlider.value[1] = rangeSlider.value[0];
-      player.value.seekTo(rangeSlider.value[0], true);
+      player.value.instance.seekTo(rangeSlider.value[0], true);
     }
-    player.value.playVideo();
+    player.value.instance.playVideo();
   }
 };
 
@@ -482,7 +485,7 @@ const toast = useToast();
 const modal = ref(false);
 const soundName = ref('');
 const router = useRouter();
-const user = computed(() => store.state.user);
+const user = useUserStore();
 
 function isValidName(name) {
   return /^[a-zA-Z 0-9\~\!\@\$\^\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
@@ -504,8 +507,8 @@ const presave = () => {
         {
           headers: {
             Authorization: JSON.stringify({
-              id: user.value.id,
-              access_token: user.value.access_token
+              id: user.id,
+              access_token: user.access_token
             })
           }
         }
@@ -541,12 +544,12 @@ const save = e => {
       let payload = {
         args: [
           editSound ? editSound.name : soundName.value,
-          player.value.getVideoUrl(),
+          player.value.instance.getVideoUrl(),
           String(rangeSlider.value[0]),
           String(rangeSlider.value[2])
         ],
         volume: volumeSlider.value / 100,
-        username: user.value.username
+        username: user.username
       };
       let endpoint = 'add';
       if (editSound) {
@@ -556,8 +559,8 @@ const save = e => {
         .post(`${import.meta.env.VITE_API}/${endpoint}`, payload, {
           headers: {
             Authorization: JSON.stringify({
-              id: user.value.id,
-              access_token: user.value.access_token
+              id: user.id,
+              access_token: user.access_token
             })
           }
         })
@@ -568,7 +571,7 @@ const save = e => {
             detail: res.data,
             life: 3000
           });
-          store.dispatch('guild/getSounds');
+          guildStore.getSounds();
           router.push('/');
         })
         .catch(e => {
@@ -594,9 +597,9 @@ onUpdated(() => {
 });
 
 onBeforeRouteLeave(async () => {
-  // player.value.pauseVideo();
+  // player.value.instance.pauseVideo();
   if (editSound) {
-    await store.dispatch('sound/resetState');
+    await soundStore.$reset();
   }
   return true;
 });

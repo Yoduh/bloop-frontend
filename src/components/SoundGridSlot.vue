@@ -36,89 +36,83 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios';
-import { mapActions } from 'vuex';
-import { mapState } from 'vuex';
+import { ref, computed } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { useGuildStore } from '@/stores/guild';
 
-export default {
-  name: 'SoundGridSlot',
-  props: {
-    sound: {
-      type: Object,
-      default: () => {
-        return {};
-      }
-    }
-  },
-  data() {
-    return {
-      items: [
-        {
-          label: 'Preview',
-          icon: 'pi pi-volume-up',
-          command: () => {
-            this.previewSound(this.sound.data.name);
-          }
-        },
-        {
-          label: 'Details',
-          icon: 'pi pi-info-circle',
-          command: () => {
-            this.$emit('openModal', this.sound.data);
-          }
-        }
-      ]
-    };
-  },
-  computed: {
-    ...mapState({ user: state => state.user }),
-    bookmarked: {
-      get() {
-        return this.user?.favoriteSounds?.includes(this.sound.data._id);
-      },
-      set() {
-        this.bookmark();
-      }
-    }
-  },
-  methods: {
-    toggle(event) {
-      this.$refs.menu.toggle(event);
-    },
-    ...mapActions('user', ['setFavoriteSounds']),
-    ...mapActions('guild', ['setFavoriteSound']),
-    bookmark() {
-      axios
-        .post(
-          `${import.meta.env.VITE_API}/setFavorite`,
-          {
-            soundId: this.sound.data._id
-          },
-          {
-            headers: {
-              Authorization: JSON.stringify({
-                id: this.user.id,
-                access_token: this.user.access_token
-              })
-            }
-          }
-        )
-        .then(res => {
-          if (res.status === 200) {
-            this.setFavoriteSounds(res.data.favorites);
-            this.setFavoriteSound({
-              id: this.sound.data._id,
-              isFavorite: !this.sound.data.isFavorite
-            });
-          }
-        });
-    },
-    previewSound(name) {
-      new Audio(`${import.meta.env.VITE_BACKEND}/${name}.opus`).play();
+const emit = defineEmits(['openModal']);
+
+const props = defineProps({
+  sound: {
+    type: Object,
+    default: () => {
+      return {};
     }
   }
-};
+});
+const items = ref([
+  {
+    label: 'Preview',
+    icon: 'pi pi-volume-up',
+    command: () => {
+      previewSound(props.sound.data.name);
+    }
+  },
+  {
+    label: 'Details',
+    icon: 'pi pi-info-circle',
+    command: () => {
+      emit('openModal', props.sound.data);
+    }
+  }
+]);
+
+const bookmarked = computed({
+  get() {
+    return user?.favoriteSounds?.includes(props.sound.data._id);
+  },
+  set() {
+    bookmark();
+  }
+});
+
+const menu = ref();
+function toggle(event) {
+  menu.value.toggle(event);
+}
+const guildStore = useGuildStore();
+const user = useUserStore();
+function bookmark() {
+  axios
+    .post(
+      `${import.meta.env.VITE_API}/setFavorite`,
+      {
+        soundId: props.sound.data._id
+      },
+      {
+        headers: {
+          Authorization: JSON.stringify({
+            id: user.id,
+            access_token: user.access_token
+          })
+        }
+      }
+    )
+    .then(res => {
+      if (res.status === 200) {
+        user.setFavoriteSounds(res.data.favorites);
+        guildStore.setFavoriteSound({
+          id: props.sound.data._id,
+          isFavorite: !props.sound.data.isFavorite
+        });
+      }
+    });
+}
+function previewSound(name) {
+  new Audio(`${import.meta.env.VITE_BACKEND}/${name}.opus`).play();
+}
 </script>
 
 <style scoped>

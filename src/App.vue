@@ -1,14 +1,13 @@
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
+import { onMounted } from 'vue';
+import { useUserStore } from '@/stores/user';
 import Nav from './components/Nav.vue';
 
-const store = useStore();
-const user = computed(() => store.state.user);
+const user = useUserStore();
 
 onMounted(async () => {
-  if (user.value.id === '' && localStorage.token) {
-    store.dispatch('user/setToken', JSON.parse(localStorage.token));
+  if (user.id === '' && localStorage.token) {
+    user.setToken(JSON.parse(localStorage.token));
   }
 });
 </script>

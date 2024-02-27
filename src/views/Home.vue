@@ -16,93 +16,85 @@
   </div>
   <div v-else class="home-container pt-1">
     <SoundGrid
-      v-if="guild.sounds.length > 0"
-      :sounds="guild.sounds"
+      v-if="guildStore.sounds.length > 0"
+      :sounds="guildStore.sounds"
       @playSound="playSound"
     />
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios';
-import { mapState } from 'vuex';
-import SoundGrid from '../components/SoundGrid.vue';
+import SoundGrid from '@/components/SoundGrid.vue';
+import { useToast } from 'primevue/usetoast';
+import { useUserStore } from '@/stores/user';
+import { useGuildStore } from '@/stores/guild';
 
-export default {
-  name: 'Home',
-  components: { SoundGrid },
-  data() {
-    return {
-      channels: []
-    };
-  },
-  computed: {
-    ...mapState({ user: state => state.user }),
-    ...mapState({ guild: state => state.guild })
-  },
-  methods: {
-    login() {
-      window.open(
-        `https://discord.com/oauth2/authorize?` +
-          `response_type=code&` +
-          `client_id=964300281674346498&` +
-          `redirect_uri=${
-            import.meta.env.VITE_DOMAIN
-          }/auth/redirect&display=popup&` +
-          `scope=identify%20guilds%20guilds.members.read%20messages.read`,
-        `_self`
-      );
-    },
-    playSound(name) {
-      if (this.guild.id === '' || this.guild.selectedChannel === '') {
-        this.$toast.add({
+function login() {
+  window.open(
+    `https://discord.com/oauth2/authorize?` +
+      `response_type=code&` +
+      `client_id=${import.meta.env.VITE_CLIENT_ID}&` +
+      `redirect_uri=${
+        import.meta.env.VITE_DOMAIN
+      }/auth/redirect&display=popup&` +
+      `scope=identify%20guilds%20guilds.members.read%20messages.read`,
+    `_self`
+  );
+}
+
+const user = useUserStore();
+const guildStore = useGuildStore();
+const toast = useToast();
+
+function playSound(name) {
+  if (guildStore.id === '' || guildStore.selectedChannel === '') {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail:
+        'Must choose a server AND channel in the navigation bar before sending a sound',
+      life: 3000
+    });
+    return;
+  }
+  let payload = {
+    name: name,
+    guildId: guildStore.id,
+    channelId: guildStore.selectedChannel,
+    username: user.username,
+    userId: user.id,
+    userAvatar: user.avatar
+  };
+  axios
+    .post(`${import.meta.env.VITE_API}/play`, payload, {
+      headers: {
+        Authorization: JSON.stringify({
+          id: user.id,
+          access_token: user.access_token
+        })
+      }
+    })
+    // error toast that includes response message
+    .catch(error => {
+      if (error.response?.data?.message) {
+        toast.add({
           severity: 'error',
           summary: 'Error',
-          detail:
-            'Must choose a server AND channel in the navigation bar before sending a sound',
+          detail: error.response.data.message,
           life: 3000
         });
-        return;
-      }
-      let payload = {
-        name: name,
-        guildId: this.guild.id,
-        channelId: this.guild.selectedChannel,
-        username: this.user.username,
-        userId: this.user.id,
-        userAvatar: this.user.avatar
-      };
-      axios
-        .post(`${import.meta.env.VITE_API}/play`, payload, {
-          headers: {
-            Authorization: JSON.stringify({
-              id: this.user.id,
-              access_token: this.user.access_token
-            })
-          }
-        })
-        // error toast that includes response message
-        .catch(error => {
-          if (error.response?.data?.message) {
-            this.$toast.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: error.response.data.message,
-              life: 3000
-            });
-            // toast for any other type of error
-          } else {
-            this.$toast.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: error,
-              life: 3000
-            });
-          }
+        // toast for any other type of error
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error,
+          life: 3000
         });
-    }
-  }
-};
+      }
+    });
+}
 </script>
 
 <style scoped>

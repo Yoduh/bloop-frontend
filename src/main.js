@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
-import YoutubeIframe from '@techassi/vue-youtube-iframe';
+import { createManager } from '@vue-youtube/core';
+import { YoutubeIframe } from '@vue-youtube/component';
 import Slider from '@vueform/slider';
 import App from './App.vue';
 import PrimeVue from 'primevue/config';
@@ -30,16 +31,17 @@ import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import router from './router/index';
-import store from './store/index';
+import { createPinia } from 'pinia';
 
 const app = createApp(App);
 app
   .use(PrimeVue)
   .use(router)
-  .use(store)
+  .use(createPinia())
   .use(ToastService)
-  .use(YoutubeIframe)
+  .use(createManager())
   .use(ConfirmationService);
+app.component('YoutubeIframe', YoutubeIframe);
 app.component('Slider', Slider);
 app.component('Button', Button);
 app.component('ToggleButton', ToggleButton);

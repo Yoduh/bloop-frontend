@@ -11,10 +11,10 @@
   >
     <youtube-iframe
       :video-id="details.link.slice(-11)"
-      player-width="100%"
-      :player-height="300"
-      :playerParameters="playerOptions"
-      :no-cookie="true"
+      width="100%"
+      :height="300"
+      :playerVars="playerOptions"
+      :cookie="false"
       ref="player"
       @state-change="stateChange"
     ></youtube-iframe>
@@ -81,10 +81,16 @@
 import { ref, watch, computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
-import { useStore } from 'vuex';
+import { useUserStore } from '@/stores/user';
+import { useGuildStore } from '@/stores/guild';
+import { useSoundStore } from '@/stores/sound';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { objectsEqual } from '../helpers/util';
+import { objectsEqual } from '@/helpers/util';
+
+const user = useUserStore();
+const guildStore = useGuildStore();
+const soundStore = useSoundStore();
 
 const props = defineProps({
   modelValue: {
@@ -123,7 +129,12 @@ const end = computed(() => Math.ceil(details.value.end));
 const player = ref(null);
 const playerOptions = ref({
   start: start,
-  end: end
+  end: end,
+  controls: 0,
+  enablejsapi: 1,
+  fs: 0,
+  modestbranding: 1,
+  rel: 0
 });
 let videoState = -1;
 let prevVideoState = null;
@@ -131,16 +142,15 @@ const stateChange = state => {
   prevVideoState = videoState;
   videoState = state.data;
   if (videoState === 1 && prevVideoState === 0) {
-    player.value.seekTo(start.value, true);
+    player.value.instance.seekTo(start.value, true);
   }
 };
 
 const toast = useToast();
 const confirm = useConfirm();
-const store = useStore();
-const user = computed(() => store.state.user);
 
 function isValidName(name) {
+  // eslint-disable-next-line no-useless-escape
   return /^[a-zA-Z 0-9\~\!\@\$\^\(\)\_\+\-\=\[\]\{\}\,\.]*$/.test(name);
 }
 
@@ -166,8 +176,8 @@ const update = () => {
       .post(`${import.meta.env.VITE_API}/update`, payload, {
         headers: {
           Authorization: JSON.stringify({
-            id: user.value.id,
-            access_token: user.value.access_token
+            id: user.id,
+            access_token: user.access_token
           })
         }
       })
@@ -190,7 +200,7 @@ const update = () => {
       })
       .finally(() => {
         modal.value = false;
-        store.dispatch('guild/getSounds');
+        guildStore.getSounds();
       });
   } else {
     modal.value = false;
@@ -211,8 +221,8 @@ const deleteSound = () => {
           {
             headers: {
               Authorization: JSON.stringify({
-                id: user.value.id,
-                access_token: user.value.access_token
+                id: user.id,
+                access_token: user.access_token
               })
             }
           }
@@ -244,7 +254,7 @@ const deleteSound = () => {
 
 const router = useRouter();
 const editSound = () => {
-  store.dispatch('sound/setSound', details.value);
+  soundStore.setSound(details.value);
   router.push({
     name: 'Create'
   });

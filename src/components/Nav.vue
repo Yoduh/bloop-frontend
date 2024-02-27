@@ -69,15 +69,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
+import { ref } from 'vue';
+import { useGuildStore } from '@/stores/guild';
+import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { sortByKey } from '../helpers/util';
+import { sortByKey } from '@/helpers/util';
 
-const store = useStore();
+const guildStore = useGuildStore();
+const user = useUserStore();
 const router = useRouter();
-const user = computed(() => store.state.user);
 
 const items = ref([
   {
@@ -89,7 +90,7 @@ const items = ref([
     label: 'Create New Sound',
     icon: 'pi pi-fw pi-cloud-upload',
     to: '/create',
-    visible: () => user.value.id !== ''
+    visible: () => user.id !== ''
   }
 ]);
 
@@ -98,20 +99,20 @@ const selectedChannel = ref('');
 const selectedGuild = ref(null);
 
 const getChannels = () => {
-  store.dispatch('guild/setGuild', selectedGuild.value);
+  guildStore.setGuild(selectedGuild.value);
   channels.value = [];
   axios
     .post(
       `${import.meta.env.VITE_API}/channels`,
       {
-        userId: user.value.id,
+        userId: user.id,
         guildId: selectedGuild.value.id
       },
       {
         headers: {
           Authorization: JSON.stringify({
-            id: user.value.id,
-            access_token: user.value.access_token
+            id: user.id,
+            access_token: user.access_token
           })
         }
       }
@@ -119,19 +120,19 @@ const getChannels = () => {
     .then(res => {
       let sortedChannels = sortByKey(res.data, 'name');
       channels.value = sortedChannels;
-      store.dispatch('guild/setChannels', sortedChannels);
+      guildStore.setChannels(sortedChannels);
     });
 };
 
 const selectChannel = channel => {
-  store.dispatch('guild/setSelectedChannel', channel.value);
+  guildStore.setSelectedChannel(channel.value);
 };
 
 const login = () => {
   window.open(
     `https://discord.com/oauth2/authorize?` +
       `response_type=code&` +
-      `client_id=964300281674346498&` +
+      `client_id=${import.meta.env.VITE_CLIENT_ID}&` +
       `redirect_uri=${
         import.meta.env.VITE_DOMAIN
       }/auth/redirect&display=popup&` +
@@ -140,7 +141,8 @@ const login = () => {
   );
 };
 const logout = () => {
-  store.dispatch('user/resetState');
+  user.$reset();
+  guildStore.$reset();
   localStorage.clear();
   router.replace('/');
 };

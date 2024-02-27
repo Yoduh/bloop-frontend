@@ -109,159 +109,155 @@
   />
 </template>
 
-<script>
-import SoundGridSlot from '../components/SoundGridSlot.vue';
-import SoundModal from '../components/SoundModal.vue';
-import SoundTable from '../components/SoundTable.vue';
-import { mapState, mapActions } from 'vuex';
+<script setup>
+import SoundGridSlot from '@/components/SoundGridSlot.vue';
+import SoundModal from '@/components/SoundModal.vue';
+import SoundTable from '@/components/SoundTable.vue';
+import { useToast } from 'primevue/usetoast';
+import { useUserStore } from '@/stores/user';
+import { useGuildStore } from '@/stores/guild';
+import { ref } from 'vue';
 
-export default {
-  name: 'SoundList',
-  emits: ['playSound', 'getSounds'],
-  components: { SoundGridSlot, SoundModal, SoundTable },
-  props: {
-    sounds: {
-      type: Array,
-      default: () => {
-        return null;
-      }
+const emit = defineEmits(['playSound', 'getSounds']);
+const props = defineProps({
+  sounds: {
+    type: Array,
+    default: () => {
+      return null;
     }
-  },
-  data() {
-    return {
-      soundFilter: '',
-      layout: 'grid',
-      soundList: [...this.sounds],
-      soundDetails: {},
-      modal: false,
-      sortKey: null,
-      sortOrder: 1,
-      sortField: 'name',
-      jumpTo: 0,
-      sortOptions: [
-        { label: 'Name (A-Z)', value: 'name' },
-        { label: 'Created Date (Newest)', value: '!createdAt' },
-        { label: 'My Favorites', value: '!isFavorite' },
-        { label: 'Created by Me', value: 'createdByMe' },
-        { label: 'Popular', value: '!playCount' }
-      ],
-      tooltipText:
-        'Use vertical bar <strong>|</strong> to separate search terms to return multiple results, e.g. <strong>falstad|redshirt</strong><br><br>' +
-        'Use quotation marks <strong>""</strong> to perform exact search, e.g. <strong>"caly"|"is"|"gay"<strong>'
-    };
-  },
-  computed: {
-    ...mapState({ user: state => state.user })
-  },
-  methods: {
-    ...mapActions('guild', ['getSounds']),
-    onFilterChange() {
-      if (this.soundFilter === '') {
-        this.soundList = [...this.sounds];
-        return;
-      }
-      let filters = this.soundFilter.split('|').filter(s => s);
-      this.soundList = this.sounds.filter(s => {
-        return (
-          filters.findIndex(f => {
-            if (f.startsWith('"') && f.endsWith('"')) {
-              return s.name === f.replaceAll('"', '').toLowerCase();
-            } else {
-              return s.name.includes(f.toLowerCase());
-            }
-          }) !== -1
-        );
-      });
-    },
-    onSortChange(event) {
-      this.soundFilter = '';
-      let value = event.value.value;
-      const sortValue = event.value;
-      this.jumpTo = 0;
-      if (value === 'createdByMe') {
-        this.soundList = this.sounds.filter(s => {
-          return s.user.toLowerCase() === this.user.username.toLowerCase();
-        });
-        value = 'name';
-      } else {
-        this.soundList = [...this.sounds];
-      }
+  }
+});
+const soundFilter = ref('');
+const layout = ref('grid');
+const soundList = ref([...props.sounds]);
+const soundDetails = ref({});
+const modal = ref(false);
+const sortKey = ref(null);
+const sortOrder = ref(1);
+const sortField = ref('name');
+const jumpTo = ref(0);
+const sortOptions = ref([
+  { label: 'Name (A-Z)', value: 'name' },
+  { label: 'Created Date (Newest)', value: '!createdAt' },
+  { label: 'My Favorites', value: '!isFavorite' },
+  { label: 'Created by Me', value: 'createdByMe' },
+  { label: 'Popular', value: '!playCount' }
+]);
+const tooltipText = ref(
+  'Use vertical bar <strong>|</strong> to separate search terms to return multiple results, e.g. <strong>falstad|redshirt</strong><br><br>' +
+    'Use quotation marks <strong>""</strong> to perform exact search, e.g. <strong>"caly"|"is"|"gay"<strong>'
+);
 
-      if (value.indexOf('!') === 0) {
-        this.sortOrder = -1;
-        this.sortField = value.substring(1, value.length);
-        this.sortKey = sortValue;
-      } else {
-        this.sortOrder = 1;
-        this.sortField = value;
-        this.sortKey = sortValue;
-      }
-    },
-    emitSound(sound) {
-      this.$emit('playSound', sound);
-    },
-    async refreshSounds(reason) {
-      this.soundFilter = '';
-      await this.getSounds();
-      this.soundList = [...this.sounds];
-      if (reason && reason === 'deleted') {
-        this.$toast.add({
-          severity: 'info',
-          summary: 'Delete',
-          detail: 'Sound Removed!',
-          life: 3000
-        });
-      } else {
-        this.$toast.add({
-          severity: 'success',
-          summary: 'Sounds Refreshed!',
-          life: 3000
-        });
-      }
-    },
-    openModal(soundDetails) {
-      this.soundDetails = { ...soundDetails };
-      this.modal = true;
-    },
-    delay(ms) {
-      return new Promise(res => setTimeout(res, ms));
-    },
-    async jumpToChar(i) {
-      /* PrimeVue's dataview component doesnt expose the items as they are currently sorted.
+const guildStore = useGuildStore();
+function onFilterChange() {
+  if (soundFilter.value === '') {
+    soundList.value = [...props.sounds];
+    return;
+  }
+  let filters = soundFilter.value.split('|').filter(s => s);
+  soundList.value = props.sounds.filter(s => {
+    return (
+      filters.findIndex(f => {
+        if (f.startsWith('"') && f.endsWith('"')) {
+          return s.name === f.replaceAll('"', '').toLowerCase();
+        } else {
+          return s.name.includes(f.toLowerCase());
+        }
+      }) !== -1
+    );
+  });
+}
+
+const user = useUserStore();
+function onSortChange(event) {
+  soundFilter.value = '';
+  let value = event.value.value;
+  const sortValue = event.value;
+  jumpTo.value = 0;
+  if (value === 'createdByMe') {
+    soundList.value = props.sounds.filter(s => {
+      return s.user.toLowerCase() === user.username.toLowerCase();
+    });
+    value = 'name';
+  } else {
+    soundList.value = [...props.sounds];
+  }
+
+  if (value.indexOf('!') === 0) {
+    sortOrder.value = -1;
+    sortField.value = value.substring(1, value.length);
+    sortKey.value = sortValue;
+  } else {
+    sortOrder.value = 1;
+    sortField.value = value;
+    sortKey.value = sortValue;
+  }
+}
+function emitSound(sound) {
+  emit('playSound', sound);
+}
+
+const toast = useToast();
+async function refreshSounds(reason) {
+  soundFilter.value = '';
+  await guildStore.getSounds();
+  soundList.value = [...props.sounds];
+  if (reason && reason === 'deleted') {
+    toast.add({
+      severity: 'info',
+      summary: 'Delete',
+      detail: 'Sound Removed!',
+      life: 3000
+    });
+  } else {
+    toast.add({
+      severity: 'success',
+      summary: 'Sounds Refreshed!',
+      life: 3000
+    });
+  }
+}
+function openModal(details) {
+  soundDetails.value = { ...details };
+  modal.value = true;
+}
+function delay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+async function jumpToChar(i) {
+  /* PrimeVue's dataview component doesnt expose the items as they are currently sorted.
       Therefore setting the paginator page like this only works with the default A-Z sort.
       However, changing the sort back to the default ALSO sets the page to 0 (uncontrollably),
       and if I set the page without at least SOME delay, the set fails.
       */
-      this.soundFilter = '';
-      this.soundList = [...this.sounds];
-      if (this.sortField !== 'name' || this.sortOrder !== 1) {
-        this.sortKey = {
-          label: 'Name (A-Z)',
-          value: 'name'
-        };
-        this.sortField = 'name';
-        this.sortOrder = 1;
-        await this.delay(0); // the time to resolve a promise even with 0 delay is itself enough of a delay. GROSS.
-      }
-      let c = String.fromCharCode(i);
-      if (c === '#') {
-        this.jumpTo = 0;
-        return;
-      }
-      let index = this.soundList.findIndex(s =>
-        s.name.startsWith(c.toLowerCase())
-      );
-      if (index === -1) {
-        if (c === 'A') index = 0;
-        else {
-          this.jumpToChar(i - 1);
-          return;
-        }
-      }
-      this.jumpTo = index;
+  soundFilter.value = '';
+  soundList.value = [...props.sounds];
+  if (sortField.value !== 'name' || sortOrder.value !== 1) {
+    sortKey.value = {
+      label: 'Name (A-Z)',
+      value: 'name'
+    };
+    sortField.value = 'name';
+    sortOrder.value = 1;
+    await delay(0); // the time to resolve a promise even with 0 delay is itself enough of a delay. GROSS.
+  }
+  let c = String.fromCharCode(i);
+  if (c === '#') {
+    jumpTo.value = 0;
+    return;
+  }
+  let index = soundList.value.findIndex(s =>
+    s.name.startsWith(c.toLowerCase())
+  );
+  if (index === -1) {
+    if (c === 'A') index = 0;
+    else {
+      jumpToChar(i - 1);
+      return;
     }
   }
-};
+  jumpTo.value = index;
+}
 </script>
 
 <style scoped>
