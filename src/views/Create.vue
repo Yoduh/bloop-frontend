@@ -414,7 +414,9 @@ const stateChange = state => {
   videoState = state.data;
   // console.log('state:', videoState);
   // console.log('prev state:', prevVideoState);
-
+  if (videoState === -1 && editSound) {
+    player.value.instance.seekTo(rangeSlider.value[0]);
+  }
   if (videoState === 1) {
     togglePlay.value = true;
     interval = window.setInterval(() => {
