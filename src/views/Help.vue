@@ -55,7 +55,7 @@
             Sliders below the video can be used to "crop" the video to just the
             sound bite you want to save:
           </p>
-          <Image src="src/assets/help-sliders.webp" alt="sliders" />
+          <Image :src="sliders" alt="sliders" />
           <p>
             The <span class="text-red-600 font-bold">red</span> slider controls
             the playback of the video
@@ -82,7 +82,7 @@
             The sound bite I want is around the 10 second mark and goes until
             around the 12 second mark:
           </p>
-          <Image src="src/assets/tut1.gif" alt="slider gif" />
+          <Image :src="tut1" alt="slider gif" />
         </div>
         <div class="mt-8 text-left">
           <h2 class="text-primary">Step 3</h2>
@@ -103,7 +103,7 @@
             I use the magnifier to help me place the start and end sliders at
             the precise start and end times of 10.60s and 11.37s respectively:
           </p>
-          <Image src="src/assets/tut2.gif" alt="slider2 gif" />
+          <Image :src="tut2" alt="slider2 gif" />
         </div>
         <div class="mt-8 text-left">
           <h2 class="text-primary">Step 4</h2>
@@ -116,7 +116,7 @@
           </p>
           <h3>Example</h3>
           <p>I will save this sound bite with the name "jimmy"</p>
-          <Image src="src/assets/jimmy.webp" alt="jimmy" />
+          <Image :src="jimmy" alt="jimmy" />
           <p>
             You will be returned to the home screen once the sound has been
             saved successfully. Now go and annoy your friends with your new
@@ -132,10 +132,7 @@
             these dropdowns with servers you belong to that also have Bloop bot.
             Select the dropdown and channel you want to play sound bites in
           </p>
-          <Image
-            src="src/assets/selects.webp"
-            alt="server and channel selects"
-          />
+          <Image :src="selects" alt="server and channel selects" />
           <h2 class="text-primary">Step 2</h2>
           <p>
             Find the sound bite you want to play. There are two ways to search.
@@ -145,7 +142,7 @@
             You can browse all sound bites using the pagination controls at the
             bottom.
           </p>
-          <Image src="src/assets/pagination.webp" alt="pagination" />
+          <Image :src="pagination" alt="pagination" />
           <h3>Method 2: Sort and Filter</h3>
           <p>
             You can sort by different sound bite properties, or filter by a
@@ -154,7 +151,7 @@
             search using double quotations "", and using vertical bar | to
             perform multiple searches with combined results (boolean OR).
           </p>
-          <Image src="src/assets/sortfilter.webp" alt="sort and filter" />
+          <Image :src="sortfilter" alt="sort and filter" />
           <p>
             When sorted alphabetically you can also use the alphabet buttons to
             jump to a page with sound bites starting with that letter.
@@ -170,7 +167,7 @@
             Discord, you can use the 3 dots to open a menu to then preview the
             sound in your browser.
           </p>
-          <Image src="src/assets/jimmybite.webp" alt="jimmy soundbite" />
+          <Image :src="jimmybite" alt="jimmy soundbite" />
           <p>
             Also note the yellow bookmark icon in the top left. Clicking this
             will save the sound bite to appear when sorting by "My Favorites"
@@ -183,14 +180,14 @@
             Find a sound you want to edit. Click the 3 dots to open a menu and
             click "Details". This will open a pop-up:
           </p>
-          <Image src="src/assets/editsound.webp" alt="edit sound modal" />
+          <Image :src="editsound" alt="edit sound modal" />
           <h3>Renaming a sound bite</h3>
           <p>
             Click the lock icon to the left of the sound bite name. This will
             unlock the name and an optional description text box. Change these
             texts and click save
           </p>
-          <Image src="src/assets/rename.webp" alt="rename fields" />
+          <Image :src="rename" alt="rename fields" />
           <p>Click OK to save these changes.</p>
           <h3>Editing start/end time of sound bite</h3>
           <p>
@@ -213,16 +210,13 @@
             voice channel. To set an entrance sound, find a sound bite you want
             to represent you, then click the 3 dots and choose "Set Entrance"
           </p>
-          <Image src="src/assets/entrance1.webp" alt="set entrance option" />
+          <Image :src="entrance1" alt="set entrance option" />
           <p>
             To disable any entrance sound from playing, find the exact same
             sound bite you used to set your entrance. The 3 dots menu will have
             a different option to "Disable Entrance".
           </p>
-          <Image
-            src="src/assets/entrance2.webp"
-            alt="disable entrance option"
-          />
+          <Image :src="entrance2" alt="disable entrance option" />
         </div>
       </div>
     </div>
@@ -230,6 +224,18 @@
 </template>
 
 <script setup>
+import sliders from '@/assets/help-sliders.webp';
+import editsound from '@/assets/editsound.webp';
+import entrance1 from '@/assets/entrance1.webp';
+import entrance2 from '@/assets/entrance2.webp';
+import jimmy from '@/assets/jimmy.webp';
+import jimmybite from '@/assets/jimmybite.webp';
+import pagination from '@/assets/pagination.webp';
+import rename from '@/assets/rename.webp';
+import selects from '@/assets/selects.webp';
+import sortfilter from '@/assets/sortfilter.webp';
+import tut1 from '@/assets/tut1.gif';
+import tut2 from '@/assets/tut2.gif';
 import { useWindowScroll } from '@vueuse/core';
 const { y } = useWindowScroll();
 </script>
