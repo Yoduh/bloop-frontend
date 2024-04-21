@@ -1,5 +1,5 @@
 <template>
-  <Menubar :model="items" class="sticky top-0 left-0 w-full">
+  <Menubar :model="items" class="sticky top-0 left-0 w-full py-1">
     <template v-slot:start>
       <img
         alt="logo"
@@ -90,6 +90,12 @@ const items = ref([
     label: 'Create New Sound',
     icon: 'pi pi-fw pi-cloud-upload',
     to: '/create',
+    visible: () => user.id !== ''
+  },
+  {
+    label: 'Tutorial',
+    icon: 'pi pi-fw pi-info-circle',
+    to: '/help',
     visible: () => user.id !== ''
   }
 ]);

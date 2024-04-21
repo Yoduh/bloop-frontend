@@ -17,7 +17,8 @@ export const useUserStore = defineStore('user', {
       avatar: '',
       guilds: [],
       guildsWithBloop: [],
-      favoriteSounds: []
+      favoriteSounds: [],
+      entrance: ''
     };
   },
   getters: {
@@ -39,6 +40,9 @@ export const useUserStore = defineStore('user', {
           this.refresh_token = token.refresh_token;
           this.scope = token.scope;
           this.token_type = token.token_type;
+          this.entrance = dbUser.data.entrance.enabled
+            ? dbUser.data.entrance.sound
+            : null;
           this.setFavoriteSounds(dbUser.data.favorites);
           this.getUserDetails();
         })

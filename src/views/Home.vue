@@ -14,7 +14,7 @@
       @click="login()"
     ></Button>
   </div>
-  <div v-else class="home-container pt-1">
+  <div v-else class="home-container">
     <SoundGrid
       v-if="guildStore.sounds.length > 0"
       :sounds="guildStore.sounds"

@@ -24,13 +24,12 @@ body {
   height: 100%;
   width: 100%;
   margin: 0px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  scroll-behavior: smooth;
+  /* overflow-x: hidden;
+  overflow-y: auto; */
 }
 body {
   margin: 0px;
-  overflow-x: hidden;
-  overflow-y: auto;
   background-color: #23272a;
 }
 #app {

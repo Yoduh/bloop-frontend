@@ -41,6 +41,10 @@ import axios from 'axios';
 import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useGuildStore } from '@/stores/guild';
+import { useToast } from 'primevue/usetoast';
+
+const guildStore = useGuildStore();
+const user = useUserStore();
 
 const emit = defineEmits(['openModal']);
 
@@ -52,8 +56,9 @@ const props = defineProps({
     }
   }
 });
-const items = ref([
+const menuItems = [
   {
+    id: 0,
     label: 'Preview',
     icon: 'pi pi-volume-up',
     command: () => {
@@ -61,13 +66,37 @@ const items = ref([
     }
   },
   {
+    id: 1,
     label: 'Details',
     icon: 'pi pi-info-circle',
     command: () => {
       emit('openModal', props.sound.data);
     }
+  },
+  {
+    id: 2,
+    label: 'Set Entrance',
+    icon: 'pi pi-discord',
+    command: () => {
+      setEntrance(props.sound.data);
+    }
+  },
+  {
+    id: 3,
+    label: 'Disable Entrance',
+    icon: 'pi pi-ban',
+    command: () => {
+      setEntrance(null);
+    }
   }
-]);
+];
+const items = computed(() => {
+  if (user.entrance && user.entrance === props.sound.data.name) {
+    return menuItems.filter(i => i.id !== 2);
+  } else {
+    return menuItems.filter(i => i.id !== 3);
+  }
+});
 
 const bookmarked = computed({
   get() {
@@ -82,8 +111,6 @@ const menu = ref();
 function toggle(event) {
   menu.value.toggle(event);
 }
-const guildStore = useGuildStore();
-const user = useUserStore();
 function bookmark() {
   axios
     .post(
@@ -113,6 +140,45 @@ function bookmark() {
 function previewSound(name) {
   new Audio(`${import.meta.env.VITE_BACKEND}/${name}.opus`).play();
 }
+
+const toast = useToast();
+const setEntrance = sound => {
+  const soundName = sound?.name ?? null;
+  console.log('soundName', soundName);
+  axios
+    .post(
+      `${import.meta.env.VITE_API}/entrance`,
+      {
+        userId: user.id,
+        soundName
+      },
+      {
+        headers: {
+          Authorization: JSON.stringify({
+            id: user.id,
+            access_token: user.access_token
+          })
+        }
+      }
+    )
+    .then(res => {
+      user.entrance = soundName;
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: res.data,
+        life: 3000
+      });
+    })
+    .catch(e => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: e.response.data,
+        life: 3000
+      });
+    });
+};
 </script>
 
 <style scoped>

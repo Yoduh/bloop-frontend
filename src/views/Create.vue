@@ -35,7 +35,7 @@
         ref="player"
         style="position: relative; left: 16px"
       ></youtube-iframe>
-      <div
+      <!-- <div
         class="px-3 grid flex-column justify-content-center align-items-center"
         style="position: relative; left: 16px"
       >
@@ -52,7 +52,7 @@
           :lazy="false"
           @update="volumeChange"
         />
-      </div>
+      </div> -->
     </div>
     <div class="grid mt-5 flex justify-content-center w-11">
       <div class="sm:col-10 md:col-7 lg:col-6 xl:col-4">
@@ -287,13 +287,13 @@ const sliderOptions = {
     }
   ]
 };
-const volumeSlider = ref(100);
+//const volumeSlider = ref(100);
 const editSound = soundStore.details;
 if (editSound) {
   url.value = editSound.link;
-  if (editSound.volume && editSound.volume < 1) {
-    volumeSlider.value = editSound.volume * 100;
-  }
+  // if (editSound.volume && editSound.volume < 1) {
+  //   volumeSlider.value = editSound.volume * 100;
+  // }
 }
 
 const player = ref(null);
@@ -382,9 +382,9 @@ const end = (e, i) => {
     player.value.instance.playVideo();
   }
 };
-const volumeChange = () => {
-  player.value.instance.setVolume(volumeSlider.value);
-};
+// const volumeChange = () => {
+//   player.value.instance.setVolume(volumeSlider.value);
+// };
 const inputStart = e => {
   if (e.value > rangeSlider.value[2]) return;
   rangeSlider.value[0] = e.value;
@@ -550,7 +550,7 @@ const save = e => {
           String(rangeSlider.value[0]),
           String(rangeSlider.value[2])
         ],
-        volume: volumeSlider.value / 100,
+        // volume: volumeSlider.value / 100,
         username: user.username
       };
       let endpoint = 'add';

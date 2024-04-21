@@ -1,7 +1,7 @@
 <template>
   <div class="header pb-4">
     <div
-      class="grid align-items-center justify-content-around"
+      class="grid align-items-center justify-content-around mx-0"
       style="position: relative"
     >
       <div class="col-12 text-center">
@@ -10,7 +10,7 @@
         </h3>
       </div>
     </div>
-    <div class="grid justify-content-around -mt-2">
+    <div class="grid justify-content-around mx-0">
       <div class="col-auto mt-2">
         <Dropdown
           v-model="sortKey"

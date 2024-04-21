@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Create from '../views/Create.vue';
+import Help from '../views/Help.vue';
 import AuthHandler from '../components/AuthHandler.vue';
 
 const redirectHome = to => {
@@ -29,6 +30,12 @@ const routes = [
     beforeEnter: [authenticate]
   },
   {
+    path: '/help',
+    name: 'Help',
+    component: Help,
+    beforeEnter: [authenticate]
+  },
+  {
     path: '/auth/redirect',
     name: 'AuthHandler',
     component: AuthHandler,
@@ -38,7 +45,17 @@ const routes = [
 
 const router = new createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      };
+    } else {
+      return { top: 0, behavior: 'smooth' };
+    }
+  }
 });
 
 export default router;
