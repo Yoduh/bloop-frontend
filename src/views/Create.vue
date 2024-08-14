@@ -178,7 +178,7 @@
       class="w-full"
       maxlength="30"
       aria-describedby="soundName-help"
-      @keypress="save"
+      @keypress.enter="save"
     />
     <small v-show="soundName.includes(' ')" id="soundName-help" class="p-error"
       >Sound name can not have a space.</small
@@ -192,7 +192,7 @@
       />
       <Button
         label="OK"
-        :disabled="soundName.includes(' ')"
+        :disabled="(soundName.includes(' ') || soundName === '') && !isLoading"
         icon="pi pi-check"
         @click="save"
         autofocus
@@ -214,6 +214,8 @@ import { useToast } from 'primevue/usetoast';
 import { useUserStore } from '@/stores/user';
 import { useGuildStore } from '@/stores/guild';
 import { useSoundStore } from '@/stores/sound';
+import { useLoadingStore } from '@/stores/loading';
+import { storeToRefs } from 'pinia';
 import axios from 'axios';
 
 const guildStore = useGuildStore();
@@ -526,65 +528,72 @@ const presave = () => {
   }
 };
 
-const save = e => {
-  if (e.key === 'Enter' || e.type === 'click') {
-    if (!editSound && soundName.value === '') {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Can not submit blank name',
-        life: 3000
-      });
-    } else if (!isValidName(soundName.value)) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Invalid name, try sticking to alphanumeric characters',
-        life: 3000
-      });
-    } else {
-      let payload = {
-        args: [
-          editSound ? editSound.name : soundName.value,
-          player.value.instance.getVideoUrl(),
-          String(rangeSlider.value[0]),
-          String(rangeSlider.value[2])
-        ],
-        // volume: volumeSlider.value / 100,
-        username: user.username
-      };
-      let endpoint = 'add';
-      if (editSound) {
-        endpoint = 'update';
-      }
-      axios
-        .post(`${import.meta.env.VITE_API}/${endpoint}`, payload, {
-          headers: {
-            Authorization: JSON.stringify({
-              id: user.id,
-              access_token: user.access_token
-            })
-          }
-        })
-        .then(res => {
-          toast.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: res.data,
-            life: 3000
-          });
-          guildStore.getSounds();
-          router.push('/');
-        })
-        .catch(e => {
-          toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: e.response.data,
-            life: 3000
-          });
-        });
+const { isLoading } = storeToRefs(useLoadingStore());
+const save = () => {
+  if (isLoading.value) return; // user double clicked
+  isLoading.value = true;
+  if (!editSound && soundName.value === '') {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Can not submit blank name',
+      life: 3000
+    });
+    isLoading.value = false;
+  } else if (!isValidName(soundName.value)) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Invalid name, try sticking to alphanumeric characters',
+      life: 3000
+    });
+
+    isLoading.value = false;
+  } else {
+    let payload = {
+      args: [
+        editSound ? editSound.name : soundName.value,
+        player.value.instance.getVideoUrl(),
+        String(rangeSlider.value[0]),
+        String(rangeSlider.value[2])
+      ],
+      // volume: volumeSlider.value / 100,
+      username: user.username
+    };
+    let endpoint = 'add';
+    if (editSound) {
+      endpoint = 'update';
     }
+    axios
+      .post(`${import.meta.env.VITE_API}/${endpoint}`, payload, {
+        headers: {
+          Authorization: JSON.stringify({
+            id: user.id,
+            access_token: user.access_token
+          })
+        }
+      })
+      .then(res => {
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: res.data,
+          life: 3000
+        });
+        guildStore.getSounds();
+        router.push('/');
+      })
+      .catch(e => {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: e.response.data,
+          life: 3000
+        });
+      })
+      .finally(() => {
+        isLoading.value = false;
+      });
   }
 };
 

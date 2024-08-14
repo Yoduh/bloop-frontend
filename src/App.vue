@@ -1,9 +1,12 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
-import Nav from './components/Nav.vue';
+import { useLoadingStore } from '@/stores/loading';
+import { storeToRefs } from 'pinia';
+import Nav from '@/components/Nav.vue';
 
 const user = useUserStore();
+const { isLoading } = storeToRefs(useLoadingStore());
 
 onMounted(async () => {
   if (user.id === '' && localStorage.token) {
@@ -16,6 +19,8 @@ onMounted(async () => {
   <Toast position="top-left" />
   <Nav />
   <router-view></router-view>
+  <BlockUI :blocked="isLoading" :fullScreen="true"></BlockUI>
+  <ProgressSpinner v-show="isLoading" class="overlay" strokeWidth="5" />
 </template>
 
 <style>
@@ -154,5 +159,14 @@ input[type='search']:focus::-webkit-search-cancel-button {
 }
 .p-datatable-wrapper {
   overflow-x: hidden;
+}
+.overlay {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  width: 10rem !important;
+  height: 10rem !important;
+  transform: translate(-50%, -50%);
+  z-index: 9000;
 }
 </style>

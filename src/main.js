@@ -26,6 +26,8 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
 import Image from 'primevue/image';
+import ProgressSpinner from 'primevue/progressspinner';
+import BlockUI from 'primevue/blockui';
 
 import 'primevue/resources/themes/md-dark-indigo/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -63,6 +65,8 @@ app.component('Column', Column);
 app.component('ColumnGroup', ColumnGroup);
 app.component('Row', Row);
 app.component('Image', Image);
+app.component('ProgressSpinner', ProgressSpinner);
+app.component('BlockUI', BlockUI);
 
 app.directive('tooltip', Tooltip);
 

@@ -23,7 +23,10 @@
         >
           <template v-slot:value="slotProps">
             <div class="guild-item guild-item-value" v-if="slotProps.value">
-              <img :src="slotProps.value.image" style="border-radius: 50%" />
+              <img
+                :src="slotProps.value.image ?? defaultImage"
+                style="border-radius: 50%"
+              />
               <div>{{ slotProps.value.name }}</div>
             </div>
             <span v-else>
@@ -75,6 +78,7 @@ import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { sortByKey } from '@/helpers/util';
+import defaultImage from '@/assets/discord-logo.png';
 
 const guildStore = useGuildStore();
 const user = useUserStore();

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import defaultImage from '@/assets/discord-logo.png';
 import { sortByKey } from '@/helpers/util';
 import { defineStore } from 'pinia';
 import { useGuildStore } from '@/stores/guild';
@@ -44,74 +43,40 @@ export const useUserStore = defineStore('user', {
             ? dbUser.data.entrance.sound
             : null;
           this.setFavoriteSounds(dbUser.data.favorites);
-          this.getUserDetails();
+          localStorage.id = dbUser.data.userId;
+          this.id = dbUser.data.userId;
+          this.username = dbUser.data.username;
+          this.avatar = dbUser.data.avatar;
+          this.guilds = dbUser.data.guilds;
+          const guildStore = useGuildStore();
+          guildStore.getSounds();
+          this.setUserGuilds();
         })
         .catch(e => {
           console.log('e', e);
         });
     },
-    getUserDetails() {
-      const guildStore = useGuildStore();
-      // fetch the user data
-      return axios
-        .get('https://discordapp.com/api/users/@me', {
-          headers: { Authorization: `Bearer ${this.access_token}` }
-        })
-        .then(res => {
-          localStorage.id = res.data.id;
-          this.id = res.data.id;
-          this.username = res.data.username;
-          this.avatar = res.data.avatar;
-          guildStore.getSounds();
-        })
-        .catch(e => {
-          console.log('get user error', e);
-        })
-        .finally(() => {
-          return this.getUserGuilds();
-        });
-    },
-    getUserGuilds() {
-      return axios
-        .get('https://discordapp.com/api/users/@me/guilds', {
-          headers: { Authorization: `Bearer ${this.access_token}` }
-        })
-        .then(res => {
-          let formattedGuilds = res.data.map(g => {
-            let link = defaultImage;
-            if (g.icon) {
-              link = `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.jpg`;
+    setUserGuilds() {
+      axios
+        .post(
+          `${import.meta.env.VITE_API}/servers`,
+          {
+            guilds: this.guilds.map(g => g.id)
+          },
+          {
+            headers: {
+              Authorization: JSON.stringify({
+                id: this.id,
+                access_token: this.access_token
+              })
             }
-            return {
-              ...g,
-              image: link
-            };
-          });
-          this.guilds = formattedGuilds;
-          axios
-            .post(
-              `${import.meta.env.VITE_API}/servers`,
-              {
-                guilds: this.guilds.map(g => g.id)
-              },
-              {
-                headers: {
-                  Authorization: JSON.stringify({
-                    id: this.id,
-                    access_token: this.access_token
-                  })
-                }
-              }
-            )
-            .then(res => {
-              this.setUserGuildsWithBloop(res.data);
-            })
-            .catch(e => {
-              console.log('get servers errors', e);
-            });
+          }
+        )
+        .then(res => {
+          this.setUserGuildsWithBloop(res.data);
         })
         .catch(e => {
-          console.log('get guilds error', e);
+          console.log('get servers errors', e);
         });
     },
     setUserGuildsWithBloop(guildIdsWithBloop) {
